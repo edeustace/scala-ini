@@ -1,0 +1,51 @@
+@(message : String, currentPage: Page[Problem], currentOrderBy: Int, currentFilter: String, user : User = null, solutions : Seq[UserSolution] = null	)(implicit flash: play.api.mvc.Flash)
+
+@****************************************
+* Helper generating navigation links    *
+****************************************@
+@isSolved(problem: Problem, solutions : Seq[UserSolution]) = @{
+     val ids = solutions.map (  _.problem_id.toString )
+     if( ids.contains(problem.id.toString) ){
+     	"yes"
+     }else{
+     	"no"
+     }
+
+}
+@main(message, user) {
+<h4>Problems</h4>
+@Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
+
+	<table>
+		
+		<tr>
+	<th>name</th>
+		<th>level</th>
+		<th>category</th>
+		<th>solved?</th>
+	</tr>
+      @problems.map { 
+          case (problem) => {
+          <tr>
+	          <td>
+		          <a href="@routes.Problems.show(problem.id.toString())">@problem.name</a>
+	          </td>
+	          <td>
+	          	@problem.level
+	          </td>
+	          <td>
+	          @problem.category
+	          </td>
+	          <td>
+	          @isSolved(problem, solutions)
+	          </td>
+          </tr>
+          }
+      }
+       </table>
+  }.getOrElse {
+    <div class="well">
+        <em>Nothing to display</em>
+    </div>
+  }
+}

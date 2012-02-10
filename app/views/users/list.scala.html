@@ -1,0 +1,31 @@
+@(message : String, currentPage: Page[User], currentOrderBy: Int, currentFilter: String, currentUser : User = null )(implicit flash: play.api.mvc.Flash)
+
+@main(message, currentUser) {
+<h4>Users</h4>
+@Option(currentPage.items).filterNot(_.isEmpty).map { users =>
+
+	<table>
+		
+		<tr>
+	<th>name</th>
+		<th>email</th>
+	</tr>
+      @users.map { 
+          case (user) => {
+          <tr>
+	          <td>
+		          <a href="@routes.Users.show(user.email.toString())">@user.name</a>
+	          </td>
+	          <td>
+	          	@user.email
+	          </td>
+          </tr>
+          }
+      }
+       </table>
+  }.getOrElse {
+    <div class="well">
+        <em>Nothing to display</em>
+    </div>
+  }
+}

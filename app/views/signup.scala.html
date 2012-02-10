@@ -1,0 +1,35 @@
+@(form: Form[(String,String,String)])(implicit flash: Flash)
+@main("Sign up") {
+        
+        @helper.form(routes.Application.completeSignup) {
+            
+            <h4>Sign up</h4>
+            
+            @form.globalError.map { error =>
+                <p class="error">
+                    @error.message
+                </p>
+            }
+            
+            @flash.get("success").map { message =>
+                <p class="success">
+                    @message
+                </p>
+            }
+            
+            <p>
+                <input type="email" name="email" placeholder="Email" id="email" value="@form("email").value">
+            </p>
+            <p>
+                <input type="name" name="name" placeholder="Name" id="name" value="@form("name").value">
+            </p> 
+            <p>
+                <input type="password" name="password" id="password" placeholder="Password">
+            </p>
+            <p>
+                <button type="submit" id="loginbutton">Sign up</button>
+            </p>
+            
+        }
+} 
+

@@ -1,0 +1,63 @@
+@(message : String, problem : Problem, user:User = null)(implicit flash: play.api.mvc.Flash) 
+
+
+@renderInputInline( test : String ) = {
+        @Html(test.replace("?", "<input type='text'></input>"))
+}
+@main(message, user) { @problem.name
+<br />
+@problem.description
+<br />
+<div class="codeWrapper" style="background-color: #ffffff; padding: 10px;">
+        <pre class='brush: scala; gutter: false;'>
+        @problem.tests
+        </pre>
+</div>
+
+
+<span id="result"></span>
+<br />
+<div class="code-div">
+<pre id="editor">
+</pre>
+</div>
+
+<div style="display: block; position: relative;">
+  <a id="solveLink" href="/problems/solve">go</a>
+</div>
+<script type="text/javascript">
+  var url = $("#solveLink").attr("href");
+  $("#solveLink").attr("href", "javascript:void(0)");
+  
+  $("#solveLink").click(function(){
+    $.post( url, { id: @problem.id, solution: window.ace.editor.getSession().getValue() },
+        function( data, textStatus,jqXHR ) {
+        console.log(data);
+        if( data.success == true ) {
+          $("#result").removeClass("failed");
+          $("#result").addClass("success");
+          $("#result").html("successful :)")
+        }
+        else {
+          $("#result").removeClass("success");
+          $("#result").addClass("failed");  
+          $("#result").html("failed :(")
+        }
+       }
+      );
+  });
+
+  window.onload = function() {
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/textmate");
+      editor.getSession().setTabSize(4);
+      editor.setHighlightActiveLine(false);
+      editor.setShowPrintMargin(false);
+      editor.renderer.setShowGutter(false);
+      var ScalaMode = ace.require("ace/mode/scala").Mode;
+      editor.getSession().setMode(new ScalaMode());
+      window.ace = (window.ace || {});
+      window.ace.editor = editor;
+  };
+  </script>
+}

@@ -1,0 +1,8 @@
+@( user : User = null)
+@if( user != null ){
+	@user.name
+  <a href="/logout">Logout</a>
+}else{
+	<a href="/login">Login</a>
+	<a href="/signup">Sign up</a>
+}

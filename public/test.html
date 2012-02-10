@@ -1,0 +1,48 @@
+<html>
+<head>
+	<title>test page</title>
+	 <link rel="stylesheet" media="screen" href="/assets/stylesheets/main.css">
+        <link rel="shortcut icon" type="image/png" href="/assets/images/favicon.png">
+        <script src="/assets/javascripts/jquery-1.7.1.min.js" type="text/javascript"></script>
+        <script src='/assets/javascripts/syntax-highlighter/scripts/XRegExp.js' type='text/javascript'></script>
+        <link href='/assets/javascripts/syntax-highlighter/styles/shCore.css' rel='stylesheet' type='text/css' />
+        <link href='/assets/javascripts/syntax-highlighter/styles/shThemeDefault.css' rel='stylesheet' type='text/css' />
+        <script src='/assets/javascripts/syntax-highlighter/scripts/shCore.js' type='text/javascript'></script>
+        <script src='/assets/javascripts/syntax-highlighter/scripts/shBrushScala.js' type='text/javascript'></script>
+        <script src="/assets/javascripts/ace/ace-noconflict.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/assets/javascripts/ace/theme-textmate-noconflict.js" type="text/javascript" charset="utf-8"></script>
+        <script src="/assets/javascripts/ace/mode-scala-noconflict.js" type="text/javascript" charset="utf-8"></script>
+
+        <script type="text/javascript">
+        	$(document).ready(function(){
+        		
+        			$("#go").click( function(){
+        				
+
+        			
+
+        				$.post( "/problems/ping", {one: "oasdfasdne", two: "twoddd" },
+        					function( data ){
+        						
+        						console.log(data);
+        					}
+        				)
+        				}
+        			)
+
+        	});
+        </script>
+</head>
+
+<body>
+
+
+<a id="go">go</a>
+
+
+<form action="/problems/ping" method="post">
+	<input type="text" name="one"></input>
+	<input type="submit"/>
+</form>
+</body>
+</html>

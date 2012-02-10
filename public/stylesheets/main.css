@@ -1,0 +1,115 @@
+/*
+#EB6C2D - orange
+#D9C8A2 - sand
+#939C80 - grey green
+#496158 - sea green
+#232F38 - navy
+*/
+body {
+	margin: 0px;
+	padding: 0px;
+	font-family: Arial, sans-serif;
+}
+
+.code-div{
+	display: block;
+	height: 120px;
+}
+
+#editor { 
+	background-color: #ffffff;
+  width: 400px;
+  height: 100px;
+}
+
+ul{
+	list-style-type: none;
+}
+
+li{
+	float: right;
+	padding: 5px;
+}
+
+.contentHolder {
+	width: 800px;
+	margin: auto;
+	background-image: url('../images/patternbg.png');
+	background-repeat: repeat-x repeat-y;
+}
+
+.mainContent
+{
+	position: absolute;
+	top: 80px;
+	bottom: 40px;
+	margin: auto;
+	
+	padding: 5px;
+	
+	display: block;
+	background-color: rgba(255,255,255,0.9);
+	width: 800px;
+	border-radius: 0px 0px 8px 8px;
+	-moz-border-radius: 8px 8px 8px 8px;
+	-webkit-border-radius: 8px 8px 8px 8px;
+	border: 0px solid #FF0D0D;
+	-moz-box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 0 5px 5px  rgba(0,0,0,0.2);
+	box-shadow: 0 0 5px 5px  rgba(0,0,0,0.2);
+}
+
+.header {
+	background-color: #ffffff;
+	padding: 5px;
+	width: 800px;
+	margin: auto;
+	border-radius: 0px 0px 8px 8px;
+	-moz-border-radius: 0px 0px 8px 8px;
+	-webkit-border-radius: 0px 0px 8px 8px;
+	border: 0px solid #FF0D0D;
+	-moz-box-shadow: 0 0 5px 5px rgba(0,0,0,0.2);
+	-webkit-box-shadow: 0 0 5px 5px  rgba(0,0,0,0.2);
+	box-shadow: 0 0 5px 5px  rgba(0,0,0,0.2);
+}
+
+.header h1 {
+	padding: 0px;
+	margin: 0px;
+	font-family: sans-serif, Arial;
+	font-family: sans-serif, Arial;
+}
+.header h1 a{
+	color: #EB6C2D;
+	text-decoration: none;
+}
+
+.bg {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #D9C8A2;
+	
+	background-image: linear-gradient(bottom, rgb(147, 156, 128) 9%,
+		rgb(73, 97, 88) 55% );
+	background-image: -o-linear-gradient(bottom, rgb(147, 156, 128) 9%,
+		rgb(73, 97, 88) 55% );
+	background-image: -moz-linear-gradient(bottom, rgb(147, 156, 128) 9%,
+		rgb(73, 97, 88) 55% );
+	background-image: -webkit-linear-gradient(bottom, rgb(147, 156, 128) 9%,
+		rgb(73, 97, 88) 55% );
+	background-image: -ms-linear-gradient(bottom, rgb(147, 156, 128) 9%,
+		rgb(73, 97, 88) 55% );
+	background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.09, rgb(147
+		, 156, 128) ), color-stop(0.55, rgb(73, 97, 88) ) );
+	background-repeat: repeat-x;
+	
+}
+
+.success {
+	background-color: green;
+}
+
+.failed {
+	background-color: red;
+}
