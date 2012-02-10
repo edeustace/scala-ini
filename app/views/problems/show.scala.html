@@ -8,10 +8,8 @@
 <br />
 @problem.description
 <br />
-<div class="codeWrapper" style="background-color: #ffffff; padding: 10px;">
-        <pre class='brush: scala; gutter: false;'>
-        @problem.tests
-        </pre>
+<div class="code-div">
+        <pre id="puzzle">@problem.tests</pre>
 </div>
 
 
@@ -58,6 +56,17 @@
       editor.getSession().setMode(new ScalaMode());
       window.ace = (window.ace || {});
       window.ace.editor = editor;
+
+
+      var readonlyEditor = ace.edit("puzzle");
+      readonlyEditor.setTheme("ace/theme/textmate");
+      readonlyEditor.getSession().setTabSize(4);
+      readonlyEditor.setHighlightActiveLine(false);
+      readonlyEditor.setShowPrintMargin(false);
+      readonlyEditor.renderer.setShowGutter(false);
+      readonlyEditor.setReadOnly(true);
+      readonlyEditor.getSession().setMode(new ScalaMode());
+
   };
   </script>
 }

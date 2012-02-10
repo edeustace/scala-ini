@@ -16,11 +16,17 @@ body {
 	height: 120px;
 }
 
-#editor { 
+#puzzle, #editor { 
 	background-color: #ffffff;
   width: 400px;
   height: 100px;
 }
+
+#puzzle{
+	
+	height: 50px;
+}
+
 
 ul{
 	list-style-type: none;
