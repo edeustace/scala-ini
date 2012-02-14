@@ -1,0 +1,240 @@
+@main-blue: #006BFF;
+@main-yellow: #E8CC00;
+@main-green: #70FF00;
+@twilight-bg: #141414;
+@solved-color: desaturate(darken(@main-green, 0%), 60%);
+@left-bar-width: 400px;
+@title-color: lighten(@main-blue, 30%);
+@button-color: lighten(desaturate(@main-blue, 60%), 10%);
+@main-bg-color: desaturate(darken(@main-blue, -30%), 40%);
+/* navbar colors */
+@navbar-gradient-top: darken(@main-bg-color,50%);
+@navbar-gradient-bottom: darken(@main-bg-color, 60%);
+@navbar-bg: @twilight-bg;
+@green-bg: darken(@main-green, 20%);
+@grey-bg: desaturate(@main-yellow, 80%);
+/* dimensions */
+@editor-height: 500px;
+
+body {
+	margin: 0px;
+	padding: 0px;
+  font-family: 'PT Sans', sans-serif;
+  background-color: @main-bg-color;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.dropdown-menu{
+  background-color: @title-color;
+}
+
+.navbar .dropdown-menu::after{
+  color: @title-color;
+  background-color: @title-color;
+  display:none;
+}
+.hidden{
+  display: none;
+  visibility: hidden;
+}
+.invisible{
+  visibility: hidden;
+}
+
+a{
+  text-decoration:none;
+}
+div{
+  display: block;
+}
+
+.navbar .nav > li > a {
+  color: @title-color;
+}
+.errorBoxHolder{
+  position: absolute;
+  bottom: 40px;
+}
+
+@well-shadow-alpha: 0.2;
+@well-shadow-distance: 1px;
+.well{
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+.puzzle-title{
+  font-size: 18px;
+}
+.puzzle-icon{
+  width: 22px;
+  height: 22px;
+  .border-radius(3px);
+}
+
+.grey-bg
+{
+  background-color: @grey-bg;
+}
+
+.green-bg
+{
+  background-color: @green-bg;
+}
+
+.title{
+  font-size: 25px;
+  font-family: 'Pacifico', cursive;
+  color: @title-color;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 0px;
+}
+
+#editor{
+  width: @left-bar-width;
+  height: @editor-height;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+.padded-10{
+  padding: 10px;
+  display: table;
+}
+
+
+.border-radius (@radius: 5px) {
+  border-radius: @radius;
+  -moz-border-radius: @radius;
+  -webkit-border-radius: @radius;
+}
+
+.border-radius-top(@radius: 5px)
+{
+  ._border-radius-each(@radius, @radius, 0px, 0px);
+}
+
+.border-radius-bottom(@radius: 5px)
+{
+  ._border-radius-each(0px, 0px, 5px, 5px);
+}
+
+._border-radius-each(@tl:5px, @tr: 5px, @bl: 5px, @br: 5px)
+{
+    -moz-border-radius-topleft: @tl;
+    border-top-left-radius: @tl;
+
+    -moz-border-radius-topright: @tr;
+    border-top-right-radius: @tr;
+
+    -moz-border-radius-bottomleft: @bl;
+    border-bottom-left-radius: @bl;
+
+    -moz-border-radius-bottomright: @br;
+    border-bottom-right-radius: @br;
+}
+
+
+.puzzle-container{
+  padding-top: 5px;
+  padding-bottom: 5px;
+  width: 100%;
+
+  .details{
+    .border-radius;
+    display: block;
+    width: 100%;
+    padding-bottom: 5px;
+  }
+  .code-tests{
+    .border-radius;
+    padding: 5px;
+    background-color: lighten(@main-bg-color, 40%);
+  }
+  .description{
+    font-style: italic;
+    padding-bottom: 5px;
+  }
+  .solved{
+    color: @solved-color;
+  }
+}
+
+.puzzle-container:after{ clear:both;}
+.max-width{
+  width: 100%;
+}
+.nudge-top{
+  position: relative;
+  top: 37px;
+}
+
+
+
+.container-fluid {
+  padding-left: 0px;
+}
+
+.column{
+  display:table;
+  float: left;
+  width: 50%;
+  height: 100%;
+}
+
+.left-400{
+  position: absolute;
+  left: 400px;
+}
+
+.right-minus-30{
+  .right-val(-30px);
+}
+
+.right-minus-50{
+  .right-val(-50px);
+}
+
+.right-val(@val: 0px){
+  right: @val;
+  position:relative;
+}
+
+.rounded-white{
+  .border-radius;
+  background-color: lighten(@main-bg-color, 30%);
+  padding:20px;
+  width: 240px;
+}
+
+.column-400{
+  float:left;
+  width: 400px;
+  height: 100%;
+}
+
+.left-bar{
+  position: fixed;
+  background-color: @twilight-bg;
+  .gen-box-shadow;
+}
+.gen-box-shadow(@alpha-one: 0.25, @alpha-two: 0.1, @blur: 3px){
+  -webkit-box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+  -moz-box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+  box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+}
+
+.navbar-inner {
+  background-color: @navbar-bg;
+  background-image: -moz-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -ms-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@navbar-gradient-top), to(@navbar-gradient-bottom));
+  background-image: -webkit-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -o-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-repeat: repeat-x;
+  .gen-box-shadow(0.5,0.6, 5px);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@navbar-gradient-top', endColorstr='@navbar-gradient-bottom', GradientType=0);
+}
+
+

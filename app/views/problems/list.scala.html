@@ -6,46 +6,93 @@
 @isSolved(problem: Problem, solutions : Seq[UserSolution]) = @{
      val ids = solutions.map (  _.problem_id.toString )
      if( ids.contains(problem.id.toString) ){
-     	"yes"
+      true
      }else{
-     	"no"
+      false
      }
+}
+
+@firstUnsolvedProblem() = @{
+ Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
+    problems.find((p:Problem) => !isSolved(p, solutions)).get.id
+   }.getOrElse(-1)
+}
+
+@leftColumnContent = {
+<div class="padded-10 max-width">
+  <div class="">
+    <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
+  </div>
+</div>
+
+<pre id="editor">/* write your code here [Ctrl-R runs it]*/</pre>
+
+<div class="errorBoxHolder padded-10">
+
+  <div id="errorBox" class="alert alert-error invisible">
+  </div>
+</div>  
+}
+
+
+@postBodyScript = {
+<script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
+<script type="text/javascript">
+  $(document).ready(function(){
+      
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/twilight");
+      editor.getSession().setTabSize(4);
+      editor.setHighlightActiveLine(false);
+      editor.setShowPrintMargin(false);
+      editor.renderer.setShowGutter(false);
+      var ScalaMode = ace.require("ace/mode/scala").Mode;
+      editor.getSession().setMode(new ScalaMode());
+      window.ace = (window.ace || {});
+      window.ace.editor = editor;
+
+      console.log("setting url to: /problems/solve")
+      var view = new com.ee.ProblemsView("/problems/solve", editor, editor.getSession().getValue());
+      
+      var firstUnsolvedId = @firstUnsolvedProblem();
+      view.init(firstUnsolvedId);
+      
+      editor.commands.addCommand({
+          name: 'myCommand',
+          bindKey: {
+              win: 'Ctrl-R',
+              mac: 'Ctrl-R',
+              sender: 'editor'
+          },
+          exec: function(env, args, request) {
+            view.runCode();
+          }
+      });
+
+
+  });
+</script>
+
 
 }
-@main(message, user) {
-<h4>Problems</h4>
-@Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
 
-	<table>
-		
-		<tr>
-	<th>name</th>
-		<th>level</th>
-		<th>category</th>
-		<th>solved?</th>
-	</tr>
-      @problems.map { 
-          case (problem) => {
-          <tr>
-	          <td>
-		          <a href="@routes.Problems.show(problem.id.toString())">@problem.name</a>
-	          </td>
-	          <td>
-	          	@problem.level
-	          </td>
-	          <td>
-	          @problem.category
-	          </td>
-	          <td>
-	          @isSolved(problem, solutions)
-	          </td>
-          </tr>
-          }
+@mainContent = {
+  @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
+    @problems.map { 
+      case (problem) => {
+        <div class="padded-10 max-width">
+         @views.html.problems.puzzleContainer(problem, isSolved(problem, solutions))
+        </div>   
       }
-       </table>
-  }.getOrElse {
+   }
+  }.getOrElse {)
     <div class="well">
-        <em>Nothing to display</em>
+       <em>Nothing to display</em>
     </div>
   }
+
 }
+
+
+@main(message, user)(mainContent)(postBodyScript, leftColumnContent) 
+

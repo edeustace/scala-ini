@@ -1,0 +1,41 @@
+@(problem:Problem, isSolved : Boolean)
+
+@getIconClass(solved:Boolean) = @{
+  solved match {
+    case true => "icon-white icon-ok"
+    case false => "icon-white icon-cog"
+  }
+  }
+
+@getIconColor(solved:Boolean) = @{
+  solved match {
+    case true => "green-bg"
+    case false => "grey-bg"
+  }
+}
+
+
+<div class="puzzle-container" id="_problem_@problem.id">
+  <table>
+    <tr>
+      <td><span class="@getIconColor(isSolved) puzzle-icon"><i class="@getIconClass(isSolved)"/></span></td>
+      <td class="puzzle-title">
+         &nbsp;@problem.name
+    </td>
+  </tr>
+  </table>
+  <!-- style="visibility:hidden; display: none; height: 0px; padding: 0px; margin: 0px;" -->
+  <div class="well hidden" >
+    <div class="description">@problem.description</div>
+    <div class="code-tests">
+      
+      <table>
+
+        @problem.tests.split("__split__").map{ t =>
+            @views.html.problems.puzzleContainerCodeTest(t)
+        }
+
+      </table>
+      </div>
+  </div>
+</div>

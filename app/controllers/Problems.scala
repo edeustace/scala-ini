@@ -123,6 +123,14 @@ object Problems extends Controller with Secured {
           var success : Boolean = UserSolution.create(user.email, id.toLong)
         }
       }
+      else
+      {
+        if( exceptionMessage.isEmpty )
+        {
+          exceptionMessage = "not equal [" + withSolution + "]"
+        }
+      }
+      
 	    
 	    Ok(
 	        toJson(

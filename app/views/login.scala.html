@@ -1,9 +1,8 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
-@main("Login") {
-        
+@base("Login") {
+       <div class="column left-400 max-width"> 
+  <div class="rounded-white">
         @helper.form(routes.Application.authenticate) {
-            
-            <h4>Login</h4>
             
             @form.globalError.map { error =>
                 <p class="error">
@@ -24,9 +23,11 @@
                 <input type="password" name="password" id="password" placeholder="Password">
             </p>
             <p>
-                <button type="submit" id="loginbutton">Login</button>
+              <button type="submit" class="btn btn-primary">Login</button>
             </p>
             
-        }
+            }
+            </div>
+            </div>
 } 
 

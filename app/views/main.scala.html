@@ -1,38 +1,38 @@
-@(title: String, user : User = null)(content: Html)(implicit header:Html = new Html(""))
+@(title: String, user : User = null)(content: Html)(implicit postBodyScripts:Html = new Html(""), leftColumnContent: Html = new Html(""))
 
 <!DOCTYPE html>
 
 <html>
     <head>
-        <title>@title</title>
-        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
-        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <script src="@routes.Assets.at("javascripts/jquery-1.7.1.min.js")" type="text/javascript"></script>
-        <script src="/assets/javascripts/ace/ace-noconflict.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/assets/javascripts/ace/theme-textmate-noconflict.js" type="text/javascript" charset="utf-8"></script>
-        <script src="/assets/javascripts/ace/mode-scala-noconflict.js" type="text/javascript" charset="utf-8"></script>
-    </head>
+      <title>@title</title>
+       @common.head()
+      </head>
     <body>
-    	<div class="bg">
-    		<div class="contentHolder">
-	    		<div class="header">
-                    <div class="logo">
-                        <a href="/">Scala-ini</a>
-                    </div>
-                    @views.html.common.menu()
-                    @views.html.common.user_bar(user)
-	    			
-                    @header
-	    		</div>
-	    		<div class="mainContent">
+      <div class="navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <div class="pull-left title">Scala Puzzles</div>
+         
+            <div class="navbar">
+              @common.user_bar(user)
+              @common.menu()
+            </div>
+           </div>
+          
+        </div>
+      </div>
+
+      <div class="container-fluid nudge-top">
+        <div class="row-fluid">
+          <!-- left column 
+          -->
+          <div class="column-400 left-bar nudge-top">
+            @leftColumnContent
+          </div>
+          <!-- right column -->
+         <div class="column left-400 max-width">
 			      @content
-	    		</div>
-    		</div>
-    	</div>
-    </body>
-    <script type="text/javascript">
-        $(document).ready(function(){
-            SyntaxHighlighter.all();
-        }); 
-    </script>
+         </div>
+       </body>
+       @postBodyScripts
 </html>

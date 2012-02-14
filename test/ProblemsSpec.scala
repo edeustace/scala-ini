@@ -36,10 +36,25 @@ class ProblemsSpec extends Specification {
       
         val solution = """((n:String) => "Hello, " + n + "!")"""
         System.out.println("solution: " + solution)
-        val result : Action[AnyContent] = controllers.Problems.solve("8", solution)
+        val result : Action[AnyContent] = controllers.Problems.solve()
         
-        val actualResult = result.apply(FakeRequest())
+        val request = FakeRequest().withFormUrlEncodedBody(("id", "8"), ("solution", solution))
+        val actualResult = result.apply(request)
         contentAsString(actualResult) must contain("success")
+        System.out.println(contentAsString(actualResult))
+        status(actualResult) must equalTo(OK)
+      }
+    }
+
+    "show that x does not equal to y" in{
+    
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      
+        val solution = """false"""
+        val result : Action[AnyContent] = controllers.Problems.solve()
+        
+        val actualResult = result.apply(FakeRequest().withFormUrlEncodedBody(("id","1"), ("solution",solution)) )
+        contentAsString(actualResult) must contain("not equal [false == true]")
         System.out.println(contentAsString(actualResult))
         status(actualResult) must equalTo(OK)
       }

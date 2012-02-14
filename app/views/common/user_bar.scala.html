@@ -1,8 +1,10 @@
 @( user : User = null)
-@if( user != null ){
-	@user.name
-  <a href="/logout">Logout</a>
-}else{
-	<a href="/login">Login</a>
-	<a href="/signup">Sign up</a>
-}
+<ul class="nav pull-right">
+  @if( user != null ){
+  <li><a href="#">@user.name</a></li>
+  <li><a href="/logout">Logout</a></li>
+  }else{
+  <li><a href="/login">Login</a></li>
+  <li><a href="/signup">Sign up</a></li>
+  }
+</ul>  

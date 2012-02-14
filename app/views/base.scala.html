@@ -1,0 +1,25 @@
+@(title: String, user : User = null)(content: Html)
+<!DOCTYPE html>
+<html>
+    <head>
+      <title>@title</title>
+        @common.head()
+      </head>
+    <body>
+      <div class="navbar-fixed-top">
+        <div class="navbar-inner">
+          <div class="container">
+            <div class="left-400 title">Scala Puzzles</div>
+         
+            <div class="navbar">
+                @common.user_bar()
+              </ul>
+            </div>
+           </div>
+        </div>
+      </div>
+      <div class="container-fluid nudge-top">
+        <div class="row-fluid">
+			      @content
+       </body>
+</html>
