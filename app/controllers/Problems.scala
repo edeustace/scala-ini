@@ -120,7 +120,7 @@ object Problems extends Controller with Secured {
 
         if( user != null )
         {
-          var success : Boolean = UserSolution.create(user.email, id.toLong)
+          var success : Boolean = UserSolution.create(user.email, id.toLong, solution)
         }
       }
       else

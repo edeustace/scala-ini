@@ -2,7 +2,16 @@ window.com = ({} || window.com)
 com.ee = ({} || com.ee)
 
 class @com.ee.ProblemsView
-  constructor: (@solveUrl, @editor, @defaultEditorText)->
+
+  ###
+  #
+  # @param solveUrl - the url to post solutions to
+  # @param editor - the ACE editor
+  # @param defaultEditorText - the default text in the editor what we can delete/restore
+  # @param existingSolutions - an object of existing solutions what we can put into the editor, 
+  # should the user choose that link.
+  ###
+  constructor: (@solveUrl, @editor, @defaultEditorText, @existingSolutions)->
     console.log "ProblemsView constructor solveUrl: #{@solveUrl}"
     null
 
@@ -12,6 +21,7 @@ class @com.ee.ProblemsView
     @bindListenerToRunButton()
     @bindListenersToEditor()
     @showProblemDetails @problemId
+    @initPuzzleLinks()
     null
 
   ###
@@ -63,11 +73,33 @@ class @com.ee.ProblemsView
     @runCode()
     null
 
+  initPuzzleLinks: ->
+    $(".puzzle-link").click (e) => @onPuzzleLinkClick e
+    null
+
+  onPuzzleLinkClick: (e) ->
+    console.log "onPuzzleLinkClick: #{e}"
+
+    newId = $(e.target).closest(".puzzle-container").attr("data-problem-id")
+
+    @closeCurrentProblemBox()
+    @problemId = parseInt newId
+    @showProblemDetails(@problemId)
+    @updateEditor()
+    null
+
+  closeCurrentProblemBox: ->
+    $("#_problem_#{@problemId}")
+      .find(".well")
+      .addClass("hidden")
+    null
+
   handleRunResponse: (data) ->
     console.log(data)
     if data.success == true 
       console.log "success"
       @markTestSuccessful()
+      @storeSolution data.solution
       @moveToNextProblem()
     else 
       console.log "failure: #{data.exception}"
@@ -85,26 +117,33 @@ class @com.ee.ProblemsView
       .addClass("green-bg")
     null
 
-  moveToNextProblem: ->
-    $("#_problem_#{@problemId}")
-      .find(".well")
-      .addClass("hidden")
+  storeSolution: (solution) ->
+    @existingSolutions[@problemId.toString()] = solution
+    null
 
-    @problemId += 1
+  moveToNextProblem: ->
+    @closeCurrentProblemBox()
+
+    @problemId = parseInt(@problemId) + 1
     console.log( @problemId )
 
     @showProblemDetails @problemId
-    @resetEditor()
+    @updateEditor()
     null
 
   showProblemDetails: (problemId) ->
+    throw "Illegal argument: showProblemDetails: you must supply a problemId" if !problemId?
+
     $("#_problem_#{problemId}").find(".hidden").removeClass("hidden")
     null
 
-  resetEditor: ->
+  updateEditor: ->
     @isResetting = true
-    test = "/* write your code here [ctrl+enter runs it]*/"
-    @editor.getSession().setValue @defaultEditorText
-    console.log " new value " + @editor.getSession().getValue()
+    
+    if @existingSolutions[@problemId]?
+      @editor.getSession().setValue @existingSolutions[@problemId]
+    else
+      @editor.getSession().setValue @defaultEditorText
+    
     @isResetting = false
-
+    null

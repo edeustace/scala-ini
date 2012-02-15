@@ -6,7 +6,7 @@ import play.api.Logger
 import anorm._
 import anorm.SqlParser._
 
-case class UserSolution(id: Pk[Long], user_email:String, problem_id:Long)
+case class UserSolution(id: Pk[Long], user_email:String, problem_id:Long, solution:String)
 
 object UserSolution{
   
@@ -14,8 +14,9 @@ object UserSolution{
     
     get[Pk[Long]]("user_solution.id") ~
     get[String]("user_solution.user_email") ~
-    get[String]("user_solution.problem_id") map {
-      case id~user_email~problem_id => UserSolution(id,user_email,problem_id.toLong)
+    get[String]("user_solution.problem_id") ~
+    get[String]("user_solution.solution") map {
+      case id~user_email~problem_id~solution => UserSolution(id,user_email,problem_id.toLong,solution)
     }
   }
 
@@ -38,7 +39,7 @@ object UserSolution{
 
   }
 
-   def create(email:String, problemId:Long): Boolean = {
+   def create(email:String, problemId:Long, solution:String): Boolean = {
     DB.withConnection { implicit connection =>
 
       val totalRows = SQL(
@@ -57,12 +58,13 @@ object UserSolution{
         SQL(
           """
             insert into user_solution
-            (user_email, problem_id) 
-            values ( {email}, {problemId} )
+            (user_email, problem_id, solution)
+            values ( {email}, {problemId}, {solution} )
           """
         ).on(
           'email -> email,
-          'problemId -> problemId
+          'problemId -> problemId,
+          'solution -> solution
         ).executeUpdate()
       
         Logger.debug("created user solution")

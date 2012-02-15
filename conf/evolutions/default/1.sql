@@ -27,6 +27,7 @@ create table user_solution(
   id  bigint not null primary key auto_increment,
   user_email varchar(255) not null,
   problem_id varchar(255) not null,
+  solution varchar(8000) not null,
   foreign key(user_email) references user(email) on delete cascade,
   foreign key(problem_id) references problem(id) on delete cascade
  
@@ -39,5 +40,6 @@ SET REFERENTIAL_INTEGRITY FALSE;
 
 drop table if exists problem;
 drop table if exists user;
+drop table if exists user_solution;
 
 

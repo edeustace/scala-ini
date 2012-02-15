@@ -12,6 +12,12 @@
      }
 }
 
+@writeSolutionsToJsObject(solutions:Seq[UserSolution]) = @{
+  solutions.foreach( (s:UserSolution) => {
+    "solution['"+s.problem_id+"'] = " + s.solution
+  })
+}
+
 @firstUnsolvedProblem() = @{
  Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
     problems.find((p:Problem) => !isSolved(p, solutions)).get.id
@@ -52,7 +58,20 @@
       window.ace.editor = editor;
 
       console.log("setting url to: /problems/solve")
-      var view = new com.ee.ProblemsView("/problems/solve", editor, editor.getSession().getValue());
+
+      var existingSolutions = {};
+
+      @solutions.map { s =>
+      existingSolutions["@s.problem_id"] = "@s.solution";
+      } 
+      
+      @writeSolutionsToJsObject(solutions)
+
+        var view = new com.ee.ProblemsView("/problems/solve", 
+            editor, 
+            editor.getSession().getValue(),
+            existingSolutions
+            );
       
       var firstUnsolvedId = @firstUnsolvedProblem();
       view.init(firstUnsolvedId);
