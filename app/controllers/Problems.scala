@@ -27,8 +27,8 @@ object Problems extends Controller with Secured {
       toJson( 
         JsObject(
           List(
-            "one"->JsString(one.first),
-            "two"->JsString(two.first)
+            "one"->JsString(one.head),
+            "two"->JsString(two.head)
           )
         )
       )
@@ -78,8 +78,8 @@ object Problems extends Controller with Secured {
     
     val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
     
-    val id : String= map.getOrElse("id", List[String]()).first
-    val solution : String = map.getOrElse("solution", List[String]()).first
+    val id : String= map.getOrElse("id", List[String]()).head
+    val solution : String = map.getOrElse("solution", List[String]()).head
     Logger.debug("Problems.solve ::: id: " + id + " solution: ["+solution+"]")
     val problem : Problem = Problem.findById(id.toLong)
     val test = problem.tests

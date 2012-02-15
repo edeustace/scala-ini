@@ -84,7 +84,7 @@ object UserSolution{
 }
 
 
-case class User(email: String, name: String, password: String)
+case class User(email: String, name: String, password: String, solutionCount : Long = -1)
 
 object User {
   
@@ -98,6 +98,16 @@ object User {
     get[String]("user.name") ~
     get[String]("user.password") map {
       case email~name~password => User(email, name, password)
+    }
+  }
+
+  val withSolutioncount = {
+    get[String]("user.email") ~
+    get[String]("user.name") ~
+    get[String]("user.password") ~
+    get[Long]("user.solution_count") map {
+      case email~name~password~solution_count 
+        => User(email, name, password, solution_count)
     }
   }
   

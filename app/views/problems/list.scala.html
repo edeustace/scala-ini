@@ -20,14 +20,36 @@
 
 @firstUnsolvedProblem() = @{
  Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
-    problems.find((p:Problem) => !isSolved(p, solutions)).get.id
+    val unsolvedProblem = 
+        problems.find((p:Problem) => !isSolved(p, solutions))
+    unsolvedProblem match{
+      case None => problems.head.id
+      case p: Option[Problem] =>  p.get.id
+    }
    }.getOrElse(-1)
+}
+
+@countProblems() = @{
+  Option(currentPage.items.size).getOrElse("?")
+}
+
+@countSolutions() = @{ solutions.size }
+
+@htmlSafe(s:String) = @{
+  var out = s.replace("\n", "\\n")
+  //TODO: weirdness with emitting html characters here..
+  out
 }
 
 @leftColumnContent = {
 <div class="padded-10 max-width">
-  <div class="">
+  <div>
+    <span id="solvedInfo"></span>
     <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
+    <span class="pull-right">
+      <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
+      <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
+    </span>
   </div>
 </div>
 
@@ -44,6 +66,7 @@
 @postBodyScript = {
 <script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
 <script type="text/javascript">
+  
   $(document).ready(function(){
       
       var editor = ace.edit("editor");
@@ -62,7 +85,7 @@
       var existingSolutions = {};
 
       @solutions.map { s =>
-      existingSolutions["@s.problem_id"] = "@s.solution";
+      existingSolutions["@s.problem_id"] = "@htmlSafe(s.solution)";
       } 
       
       @writeSolutionsToJsObject(solutions)
@@ -72,9 +95,11 @@
             editor.getSession().getValue(),
             existingSolutions
             );
-      
+
+      var solvedSoFar = @countSolutions()
+      var totalProblems = @countProblems()
       var firstUnsolvedId = @firstUnsolvedProblem();
-      view.init(firstUnsolvedId);
+      view.init(firstUnsolvedId, solvedSoFar, totalProblems);
       
       editor.commands.addCommand({
           name: 'myCommand',

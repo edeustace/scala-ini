@@ -10,18 +10,28 @@ class @com.ee.ProblemsView
   # @param defaultEditorText - the default text in the editor what we can delete/restore
   # @param existingSolutions - an object of existing solutions what we can put into the editor, 
   # should the user choose that link.
+  #
+  # 
+  # <span>Solved: @countSolutions() of @countProblems()</span>
   ###
   constructor: (@solveUrl, @editor, @defaultEditorText, @existingSolutions)->
     console.log "ProblemsView constructor solveUrl: #{@solveUrl}"
     null
 
-  init: (problemId)->
+  ###
+  # @param problemId - the first problem to open
+  # @parm solvedSoFar - the number of problems solved so far
+  # @param totalProblems - the total number of problems
+  ###
+  init: (problemId, @solvedSoFar, @totalProblems )->
     @problemId = problemId
     console.log "init with id: #{@problemId}"
     @bindListenerToRunButton()
     @bindListenersToEditor()
     @showProblemDetails @problemId
     @initPuzzleLinks()
+    @initPreviousNextButtons()
+    @updateSolvedInfo 0
     null
 
   ###
@@ -101,6 +111,7 @@ class @com.ee.ProblemsView
       @markTestSuccessful()
       @storeSolution data.solution
       @moveToNextProblem()
+      @updateSolvedInfo 1
     else 
       console.log "failure: #{data.exception}"
       $("#errorBox")
@@ -122,11 +133,22 @@ class @com.ee.ProblemsView
     null
 
   moveToNextProblem: ->
+    if @canMoveToNext()
+      @moveToProblem( parseInt(@problemId) + 1)   
+    null
+  
+  canMoveToNext: ->
+    @nodeExists( parseInt(@problemId) + 1)
+
+  canMoveToPrevious: ->
+    @nodeExists( parseInt(@problemId) - 1)
+  
+  nodeExists: (id) ->
+    $("#_problem_#{id}").length == 1
+
+  moveToProblem: (newProblemId) ->
     @closeCurrentProblemBox()
-
-    @problemId = parseInt(@problemId) + 1
-    console.log( @problemId )
-
+    @problemId = newProblemId
     @showProblemDetails @problemId
     @updateEditor()
     null
@@ -146,4 +168,39 @@ class @com.ee.ProblemsView
       @editor.getSession().setValue @defaultEditorText
     
     @isResetting = false
+    null
+
+  initPreviousNextButtons: ->
+    $("#prevButton").click (e) => @onPrevClick e 
+    $("#nextButton").click (e) => @onNextClick e 
+    @updatePrevNextButtons()
+    null
+
+  updatePrevNextButtons: ->
+    updateButton = (id, fn ) ->
+      if fn.call this 
+        $(id).removeClass("disabled")
+      else
+        $(id).addClass("disabled")
+      null
+    
+    updateButton.call this, "#prevButton", @canMoveToPrevious 
+    updateButton.call this, "#nextButton", @canMoveToNext
+    null
+
+  onPrevClick: (e) ->
+    return if !@canMoveToPrevious()
+    @moveToProblem( parseInt(@problemId) - 1 )
+    @updatePrevNextButtons()
+    null
+
+  onNextClick: (e) ->
+    return if !@canMoveToNext()
+    @moveToNextProblem()
+    @updatePrevNextButtons()
+    null
+
+  updateSolvedInfo: (increment)->
+    @solvedSoFar += increment if @solvedSoFar < @totalProblems
+    $("#solvedInfo").html("Solved #{@solvedSoFar} of #{@totalProblems}")
     null
