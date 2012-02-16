@@ -44,12 +44,7 @@
 @leftColumnContent = {
 <div class="padded-10 max-width">
   <div>
-    <span id="solvedInfo"></span>
     <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
-    <span class="pull-right">
-      <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
-      <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
-    </span>
   </div>
 </div>
 
@@ -121,6 +116,14 @@
 }
 
 @mainContent = {
+<div class="info-box">
+  <span id="solvedInfo" class="pull-left" style="padding-top: 5px;"></span>
+    <span class="pull-right">
+      <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
+      <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
+    </span>
+</div>
+<div class="puzzles-holder">
   @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
     @problems.map { 
       case (problem) => {
@@ -134,7 +137,7 @@
        <em>Nothing to display</em>
     </div>
   }
-
+</div>
 }
 
 

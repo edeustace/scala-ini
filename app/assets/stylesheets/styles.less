@@ -29,6 +29,22 @@ body {
   background-color: @title-color;
 }
 
+.info-box{
+  padding: 5px;
+  background-color: @button-color;
+  right: 0px;
+  left: 400px;
+  position:fixed;
+  top: 40px;
+  z-index: 1005;
+  .gen-box-shadow;
+  .gen-bar-gradient(@button-color);
+}
+
+.puzzles-holder{
+  position: relative;
+  top: 40px;
+}
 .selected{
   a{
   font-weight: bold;
@@ -249,6 +265,17 @@ a.puzzle-link{
   background-repeat: repeat-x;
   .gen-box-shadow(0.5,0.6, 5px);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@navbar-gradient-top', endColorstr='@navbar-gradient-bottom', GradientType=0);
+}
+
+.gen-bar-gradient(@color: #00ff00 ){
+ background-color: @color;
+  background-image: -moz-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -ms-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(darken(@color, 10%)), to(@color));
+  background-image: -webkit-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -o-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: linear-gradient(top, darken(@color, 10%), @color);
+
 }
 
 
