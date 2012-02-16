@@ -28,9 +28,9 @@ class @com.ee.ProblemsView
     console.log "init with id: #{@problemId}"
     @bindListenerToRunButton()
     @bindListenersToEditor()
-    @showProblemDetails @problemId
     @initPuzzleLinks()
     @initPreviousNextButtons()
+    @moveToProblem @problemId
     @updateSolvedInfo 0
     null
 
@@ -88,14 +88,9 @@ class @com.ee.ProblemsView
     null
 
   onPuzzleLinkClick: (e) ->
-    console.log "onPuzzleLinkClick: #{e}"
-
     newId = $(e.target).closest(".puzzle-container").attr("data-problem-id")
-
-    @closeCurrentProblemBox()
-    @problemId = parseInt newId
-    @showProblemDetails(@problemId)
-    @updateEditor()
+    newId = parseInt newId
+    @moveToProblem newId
     null
 
   closeCurrentProblemBox: ->
@@ -150,6 +145,8 @@ class @com.ee.ProblemsView
     @closeCurrentProblemBox()
     @problemId = newProblemId
     @showProblemDetails @problemId
+    $(".puzzle-title").removeClass("selected")
+    $("#_problem_#{@problemId}").find(".puzzle-title").addClass("selected")
     @updateEditor()
     null
 
