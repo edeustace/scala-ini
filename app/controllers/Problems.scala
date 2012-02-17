@@ -60,12 +60,15 @@ object Problems extends Controller with Secured {
     }
     
     Ok(views.html.problems.list(
-      "list of items",
+      "Scala Puzzles",
       Problem.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")),orderBy, filter, user, solutions )
 
     )
   }
 
+  def testPage() = Action{ implicit request => 
+    Ok(views.html.problems.testPage())
+  }
   def show(id:String) = Action{ implicit request => 
 
     val userIsLoggedIn : Boolean = isLoggedIn(request)
@@ -74,38 +77,85 @@ object Problems extends Controller with Secured {
     Ok(views.html.problems.show("username", Problem.findById(id.toLong), getUser(request)))
   }
 
+  def solveRaw() = Action { implicit request => 
+    val solution : String = getFormParameter( request, "solution") 
+    val responseObject = _solve(solution)
+    Ok( toJson( responseObject) )
+  }
+
+  private def buildResponse( success : Boolean, t : Tuple2[String,String]* ) : JsObject = {
+    
+    var list : List[Tuple2[String,JsString]]= List()
+    for( tuple <- t) {
+      val newTuple = (tuple._1, JsString(tuple._2))
+      list = list:::List(newTuple)
+    }
+
+    JsObject(
+     List("success"-> JsBoolean(success)):::list
+    )
+  }
+
+  private def _solve( solution : String ) : JsObject = {
+  
+    solution match {
+      case null => buildResponse(false, ("solution", solution))
+      case _ => {
+        
+        if( solution isEmpty )
+        {
+          return buildResponse(false, ("message", "solution is empty"))
+        }
+
+        Logger.debug("Problems._solve :: apply: ["+ solution+"]")
+        
+        var result = false
+        var message = ""
+
+        try
+        {
+          result = (new Eval).apply[Boolean](solution)
+        }
+        catch
+        {
+          case ex: Exception => message = ex.getMessage() 
+        }
+
+        buildResponse(result, ("message", message), ("solution", solution))
+      }
+    }
+  }
+
+  private def getFormParameter(  request : Request[AnyContent], name : String ) : String = {
+    val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
+    map.getOrElse(name, List[String]()).head
+  }
+
   def solve() = Action{ implicit  request =>
     
-    val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
+    val id : String = getFormParameter( request, "id" )
+    val solution : String = getFormParameter( request, "solution") 
     
-    val id : String= map.getOrElse("id", List[String]()).head
-    val solution : String = map.getOrElse("solution", List[String]()).head
     Logger.debug("Problems.solve ::: id: " + id + " solution: ["+solution+"]")
+    
     val problem : Problem = Problem.findById(id.toLong)
     val test = problem.tests
-    val withSolution : String = test.replace("?", solution )
     
     if( solution.isEmpty )
     {
       Ok(
         toJson(
-          JsObject(
-	                List("success"->JsBoolean(false), 
-                        "solution"->JsString(solution), 
-                        "blahblah" -> JsString("blahbbbbbb")
-                      )
-	            )    
-        )
+          buildResponse(false, ("solution", solution))
+	      )    
       )
     }
     else
     {
+      val withSolution : String = test.replace("?", solution )
 	    var result : Boolean = false;
 	    var exceptionMessage : String = ""
 	    try
 	    {
-        Logger.debug("Problems.solve :: test: ["+test+"]")
-        Logger.debug("Problems.solve :: solution: ["+solution+"]")
         Logger.debug("Problems.solve :: apply: ["+ withSolution+"]")
 	    	result = (new Eval).apply[Boolean](withSolution)
 	    }

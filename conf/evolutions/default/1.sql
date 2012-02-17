@@ -14,10 +14,11 @@ create table problem (
   id 						bigint not null,
   name 					varchar(255) not null,
   description 	varchar(255) not null,
-  tests 				varchar(255) not null,
+  tests 				varchar(8000) not null,
   level 				varchar(255) not null,
   category 			varchar(255) not null,
   user_email		varchar(255) not null,
+  solution      varchar(8000),
   foreign key(user_email)   references user(email) on delete cascade,
   constraint 		pk_problem primary key (id))
 ;

@@ -1,0 +1,78 @@
+
+@leftColumnContent = {
+}
+
+
+@postBodyScript = {
+<script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+      
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/twilight");
+      editor.getSession().setTabSize(4);
+      editor.setHighlightActiveLine(true);
+      editor.setShowPrintMargin(true);
+      editor.renderer.setShowGutter(true);
+      var ScalaMode = ace.require("ace/mode/scala").Mode;
+      editor.getSession().setMode(new ScalaMode());
+      window.ace = (window.ace || {});
+      window.ace.editor = editor;
+
+      console.log("setting url to: /problems/solve")
+
+      var existingSolutions = {};
+
+      
+
+        var view = new com.ee.ProblemsView("/problems/solve_raw", 
+            editor, 
+            editor.getSession().getValue(),
+            existingSolutions
+            );
+
+      var solvedSoFar = 0;
+      var totalProblems = 0; 
+      var firstUnsolvedId = 1;
+      view.init(firstUnsolvedId, solvedSoFar, totalProblems);
+      
+      editor.commands.addCommand({
+          name: 'myCommand',
+          bindKey: {
+              win: 'Ctrl-R',
+              mac: 'Ctrl-R',
+              sender: 'editor'
+          },
+          exec: function(env, args, request) {
+            view.runCode();
+          }
+      });
+
+      //init pretty print
+      prettyPrint()
+  });
+</script>
+
+
+}
+
+@mainContent = {
+<div class="padded-10 max-width">
+  <div>
+    <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
+  </div>
+</div>
+
+<pre id="editor" style="position: absolute; width: 600px; left: 0px; right 0px; top: 60px;">/* write your code here [Ctrl-R runs it]*/</pre>
+
+<div class="errorBoxHolder padded-10">
+
+  <div id="errorBox" class="alert alert-error invisible">
+  </div>
+</div>  
+}
+
+
+@main("Test page", null)(mainContent)(postBodyScript, leftColumnContent) 
+

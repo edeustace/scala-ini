@@ -26,6 +26,42 @@ insert into problem (id,name,description,tests,level,category,user_email)
     
     interleave(List(1,2,3,4),List("a","b","c","d")) == List(1,"a",2,"b",3,"c",4,"d")', 'simple', 'functions', 'ed.eustace@gmail.com');
 
+insert into problem (id,name,description,tests,level,category,user_email,solution)
+  values(10, 'Find attribute with value', 'Write a function that returns a list of nodes that contain an attribute with a given value',
+    '
+    import scala.xml._
+
+    /**
+     * getNodesWithAttributeValue( node : Node, value : String ) : List[Node]
+     */
+    ?
+
+    val xml = <div>
+        <span class="test">hello</span>
+        <div class="test"><p>hello</p></div>
+      </div>
+    
+    getNodesWithAttributeValue(xml, "test") == 
+            List[Node](
+              <span class="test">hello</span>, 
+              <div class="test"><p>hello</p></div>
+            )
+    ',
+    'easy', 'function', 'ed.eustace@gmail.com',
+  '
+  //solution
+def getNodesWithAttributeValue( node : Node, stringVal : String ) : List[Node] = 
+{
+    def attributeValueEquals(value: String)(node: Node) = {
+        node.attributes.exists(_.value.text == value)  
+    }
+    //get all nodes and subnodes
+    val ns : NodeSeq = node \\ "_"
+    ns.filter( attributeValueEquals(stringVal) ).toList
+}
+  
+  ');
+
 insert into user_solution (user_email,problem_id, solution)
 		values ('ed.eustace@gmail.com',1, 'true');
 

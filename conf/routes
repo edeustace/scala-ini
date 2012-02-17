@@ -3,22 +3,24 @@
 # ~~~~
 
 # Authentication
-GET     /login                              controllers.Application.login
-POST    /login                              controllers.Application.authenticate
-GET     /signup                             controllers.Application.signup
-POST		/signup															controllers.Application.completeSignup
-GET     /logout                             controllers.Application.logout
+GET     /login                      controllers.Application.login
+POST    /login                      controllers.Application.authenticate
+GET     /signup                     controllers.Application.signup
+POST    /signup                     controllers.Application.completeSignup
+GET     /logout                     controllers.Application.logout
 
-GET			/users															controllers.Users.index()
-GET			/users/:email												controllers.Users.show(email)
+GET      /users                     controllers.Users.index()
+GET      /users/:email              controllers.Users.show(email)
 
 # Home page
-POST		/problems/ping							controllers.Problems.ping()
+POST    /problems/ping              controllers.Problems.ping()
+GET     /problems/test              controllers.Problems.testPage()
 GET     /                           controllers.Problems.index()
 GET     /problems                   controllers.Problems.index()
-GET 		/problems/authenticate			controllers.Problems.testAuthentication()
+GET     /problems/authenticate      controllers.Problems.testAuthentication()
 GET     /problems/:id               controllers.Problems.show(id)
-POST    /problems/solve controllers.Problems.solve()
+POST    /problems/solve             controllers.Problems.solve()
+POST    /problems/solve_raw         controllers.Problems.solveRaw()
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 

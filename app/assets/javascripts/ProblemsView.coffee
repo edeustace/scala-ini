@@ -91,6 +91,7 @@ class @com.ee.ProblemsView
     newId = $(e.target).closest(".puzzle-container").attr("data-problem-id")
     newId = parseInt newId
     @moveToProblem newId
+    @updatePrevNextButtons()
     null
 
   closeCurrentProblemBox: ->
