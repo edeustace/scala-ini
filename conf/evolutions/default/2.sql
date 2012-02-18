@@ -27,7 +27,33 @@ insert into problem (id,name,description,tests,level,category,user_email)
     interleave(List(1,2,3,4),List("a","b","c","d")) == List(1,"a",2,"b",3,"c",4,"d")', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 insert into problem (id,name,description,tests,level,category,user_email,solution)
-  values(10, 'Find attribute with value', 'Write a function that returns a list of nodes that contain an attribute with a given value',
+values( 10, 'Map', 'The map function takes two arguments: a function (f) and a sequence (s). Map returns a new sequence consisting of the result of applying f to each item of s. Do not confuse the map function with the map data structure.',
+  'List(1,2,3).map( (_ + 5)) == ?',
+  'easy',
+  'map',
+  'ed.eustace@gmail.com',
+  'List(6,7,8)');
+
+insert into problem (id,name,description,tests,level,category,user_email,solution)
+values( 11, 'Filter',
+  'The filter function takes two arguments: a predicate function (f) and a sequence (s). Filter returns a new sequence consisting of all the items of s for which (f item) returns true.',
+  'List(3,4,5,6,7,8).filter(_ > 5) == ?',
+  'easy',
+  'map',
+  'ed.eustace@gmail.com',
+  'List(6,7,8)');
+
+insert into problem (id,name,description,tests,level,category,user_email,solution)
+values( 12, 'Last element',
+  'Write a function which returns the last element in a sequence. Note: dont use last',
+  '(?)( List(1,2,3,4) ) == 4',
+  'easy',
+  'map',
+  'ed.eustace@gmail.com',
+  '(l:List) => l(l.length -1)');
+
+insert into problem (id,name,description,tests,level,category,user_email,solution)
+  values(13, 'Find attribute with value', 'Write a function that returns a list of nodes that contain an attribute with a given value',
     '
     import scala.xml._
 
@@ -61,6 +87,45 @@ def getNodesWithAttributeValue( node : Node, stringVal : String ) : List[Node] =
 }
   
   ');
+
+insert into problem (id,name,description,tests,level,category,user_email,solution)
+  values(14, 'Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
+'
+import scala.xml._
+
+val InputXml : Node =
+<root>
+    <subnode>
+        <version>1</version>
+    </subnode>
+    <contents>
+        <version>1</version>
+    </contents>
+</root>
+// write method here
+// updateVersion( node : Node ) : Node)
+?
+
+val updatedXml : Node = updateVersion(InputXml)
+(updatedXml\"subnode"\"version" text)  == "2" && (updatedXml\"contents"\"version" text) == "1"
+
+',
+'easy', 
+'function', 
+'ed.eustace@gmail.com',
+'
+def updateVersion( node : Node ) : Node = {
+   def updateElements( seq : Seq[Node]) : Seq[Node] = 
+     for( subNode <- seq ) yield updateVersion( subNode )  
+
+   node match {
+     case <root>{ ch @ _* }</root> => <root>{ updateElements( ch ) }</root>
+     case <subnode>{ ch @ _* }</subnode> => <subnode>{ updateElements( ch ) }</subnode>
+     case <version>{ contents }</version> => <version>2</version>
+     case other @ _ => other
+   }
+ }
+');
 
 insert into user_solution (user_email,problem_id, solution)
 		values ('ed.eustace@gmail.com',1, 'true');

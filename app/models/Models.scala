@@ -73,7 +73,7 @@ object Problem {
    * @param filter Filter applied on the name column
    */
   def list(page: Int = 0, 
-          pageSize: Int = 10,
+          pageSize: Int = 100,
           orderBy: Int = 1, 
           filter: String = ""): Page[(Problem)] = {
     
