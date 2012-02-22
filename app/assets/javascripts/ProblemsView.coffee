@@ -1,5 +1,5 @@
-window.com = ({} || window.com)
-com.ee = ({} || com.ee)
+window.com = (window.com || {})
+com.ee = (com.ee || {})
 
 class @com.ee.ProblemsView
 
@@ -14,8 +14,10 @@ class @com.ee.ProblemsView
   # 
   # <span>Solved: @countSolutions() of @countProblems()</span>
   ###
-  constructor: (@solveUrl, @editor, @defaultEditorText, @existingSolutions)->
+  constructor: (@solveUrl, @editor, @problems,  @existingSolutions)->
     console.log "ProblemsView constructor solveUrl: #{@solveUrl}"
+    @processor = new com.ee.string.StringUpdateProcessor()
+    @hook = new com.ee.string.AceEditorHook @editor, @processor
     null
 
   ###
@@ -94,11 +96,6 @@ class @com.ee.ProblemsView
     @updatePrevNextButtons()
     null
 
-  closeCurrentProblemBox: ->
-    $("#_problem_#{@problemId}")
-      .find(".well")
-      .addClass("hidden")
-    null
 
   handleRunResponse: (data) ->
     console.log(data)
@@ -143,29 +140,26 @@ class @com.ee.ProblemsView
     $("#_problem_#{id}").length == 1
 
   moveToProblem: (newProblemId) ->
-    @closeCurrentProblemBox()
     @problemId = newProblemId
-    @showProblemDetails @problemId
-    $(".puzzle-title").removeClass("selected")
-    $("#_problem_#{@problemId}").find(".puzzle-title").addClass("selected")
+    $("#main-puzzle-title").html(@problems[@problemId].title)
+    $("#main-puzzle-subheader").html(@problems[@problemId].description)
+
+    $(".puzzle-container").removeClass("selected")
+    $("#_problem_#{@problemId}").addClass("selected")
     @updateEditor()
     null
 
-  showProblemDetails: (problemId) ->
-    throw "Illegal argument: showProblemDetails: you must supply a problemId" if !problemId?
-
-    $("#_problem_#{problemId}").find(".hidden").removeClass("hidden")
-    null
 
   updateEditor: ->
-    @isResetting = true
-    
+    code = @problems[@problemId].code
+    @processor.init code
+        
     if @existingSolutions[@problemId]?
       @editor.getSession().setValue @existingSolutions[@problemId]
     else
-      @editor.getSession().setValue @defaultEditorText
+      @editor.getSession().setValue code 
+
     
-    @isResetting = false
     null
 
   initPreviousNextButtons: ->

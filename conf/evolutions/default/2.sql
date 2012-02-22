@@ -17,18 +17,25 @@ insert into problem (id,name,description,tests,level,category,user_email)
 insert into problem (id,name,description,tests,level,category,user_email) 
 	values (6,'Dropping Lists','What does drop give you?','? == List(1,2,3,4).drop(2)','easy', 'lists', 'ed.eustace@gmail.com');
 insert into problem (id,name,description,tests,level,category,user_email)
-	values (7,'Double up', 'Write a function that returns a double', '? (2) == 4', 'easy', 'function', 'ed.eustace@gmail.com');
+	values (7,'Double up', 'Write a function that returns a double', '(?) (2) == 4', 'easy', 'function', 'ed.eustace@gmail.com');
 insert into problem (id,name,description,tests,level,category,user_email)
 	values (8,'Hello World', 'Write a function that returns a personalized greeting', '? ("Dave") == "Hello, Dave!"', 'easy', 'function', 'ed.eustace@gmail.com');
 insert into problem (id,name,description,tests,level,category,user_email)
 	values (9,'Interleave', 'Write a function called "interleave" that interleaves 2 lists', 
-    '?
+    'def interleave( a: List[Any], b: List[Any] ) : List[Any] = {
+    ?
+    }
     
     interleave(List(1,2,3,4),List("a","b","c","d")) == List(1,"a",2,"b",3,"c",4,"d")', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 insert into problem (id,name,description,tests,level,category,user_email,solution)
-values( 10, 'Map', 'The map function takes two arguments: a function (f) and a sequence (s). Map returns a new sequence consisting of the result of applying f to each item of s. Do not confuse the map function with the map data structure.',
-  'List(1,2,3).map( (_ + 5)) == ?',
+values( 10, 'Map', 'working with maps!',
+  '/**
+ * The map function takes two arguments: a function (f) and a sequence (s). 
+ * Map returns a new sequence consisting of the result of applying f to each item of s. 
+ * Do not confuse the map function with the map data structure.
+ */
+List(1,2,3).map( (_ + 5)) == ?',
   'easy',
   'map',
   'ed.eustace@gmail.com',
@@ -36,8 +43,12 @@ values( 10, 'Map', 'The map function takes two arguments: a function (f) and a s
 
 insert into problem (id,name,description,tests,level,category,user_email,solution)
 values( 11, 'Filter',
-  'The filter function takes two arguments: a predicate function (f) and a sequence (s). Filter returns a new sequence consisting of all the items of s for which (f item) returns true.',
-  'List(3,4,5,6,7,8).filter(_ > 5) == ?',
+  'fun with filter!',
+  '/**
+ * The filter function takes two arguments: a predicate function (f) and a sequence (s). 
+ * Filter returns a new sequence consisting of all the items of s for which (f item) returns true.
+ */
+List(3,4,5,6,7,8).filter(_ > 5) == ?',
   'easy',
   'map',
   'ed.eustace@gmail.com',
@@ -57,10 +68,9 @@ insert into problem (id,name,description,tests,level,category,user_email,solutio
     '
     import scala.xml._
 
-    /**
-     * getNodesWithAttributeValue( node : Node, value : String ) : List[Node]
-     */
-    ?
+    def getNodesWithAttributeValue( node : Node, value : String ) : List[Node] = {
+      ?
+    }
 
     val xml = <div>
         <span class="test">hello</span>

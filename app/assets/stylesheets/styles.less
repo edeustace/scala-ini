@@ -29,22 +29,38 @@ body {
   background-color: @title-color;
 }
 
+.run-bar{
+
+  .gen-bar-gradient( darken(@button-color, 20%));
+
+  .title{
+    font-size: 20px;
+    color: white;
+  }
+
+  .subheader{
+    font-size: 15px;
+    color: saturate(@main-bg-color, 70%);
+
+  }
+}
+
 .info-box{
-  padding: 5px;
+  padding: 14px;
   background-color: @button-color;
-  right: 0px;
-  left: 400px;
+  width: @left-bar-width - 28;
+  left: 0px;
   position:fixed;
   top: 40px;
   z-index: 1005;
   .gen-box-shadow;
   .gen-bar-gradient(@button-color);
 }
-
-.puzzles-holder{
+/*.puzzles-holder{
   position: relative;
   top: 40px;
-}
+}*/
+
 .selected{
   a{
   font-weight: bold;
@@ -122,8 +138,12 @@ a.puzzle-link{
 }
 
 #editor{
-  width: @left-bar-width;
-  height: @editor-height;
+  bottom: 0px;
+  top:55px;
+  left: 0px;
+  right: 0px;
+  height: 100%;
+  width: 100%;
   padding-top: 0px;
   margin-top: 0px;
 }
@@ -165,11 +185,16 @@ a.puzzle-link{
 }
 
 
+.puzzle-container.selected{
+    background-color: darken(@main-bg-color, 10%);
+  }
 .puzzle-container{
-  padding-top: 5px;
-  padding-bottom: 5px;
+  padding: 5px;
   width: 100%;
 
+  table{
+    width: 95%;
+  }
   .details{
     .border-radius;
     display: block;
@@ -185,7 +210,7 @@ a.puzzle-link{
     font-style: italic;
     padding-bottom: 5px;
   }
-  .solved{
+  solved{
     color: @solved-color;
   }
 }
@@ -199,7 +224,14 @@ a.puzzle-link{
   top: 37px;
 }
 
-
+.editor-main-area
+{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 40px;
+  background-color: @twilight-bg;
+}
 
 .container-fluid {
   padding-left: 0px;
@@ -230,6 +262,22 @@ a.puzzle-link{
   position:relative;
 }
 
+hr.thin{
+ padding: 0px;
+ margin: 0px; 
+ border: none;
+ border-top: dashed 1px lighten(@main-bg-color, 10%);
+}
+
+.holder{
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  top: 98px;
+  width: @left-bar-width; 
+  overflow: auto;
+}
+
 .rounded-white{
   .border-radius;
   background-color: lighten(@main-bg-color, 30%);
@@ -244,8 +292,7 @@ a.puzzle-link{
 }
 
 .left-bar{
-  position: fixed;
-  background-color: @twilight-bg;
+  background-color: @main-bg-color;
   .gen-box-shadow;
 }
 .gen-box-shadow(@alpha-one: 0.25, @alpha-two: 0.1, @blur: 3px){

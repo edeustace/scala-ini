@@ -18,24 +18,12 @@
 <div class="puzzle-container" id="_problem_@problem.id" data-problem-id="@problem.id">
   <table>
     <tr>
-      <td><span class="@getIconColor(isSolved) puzzle-icon"><i class="@getIconClass(isSolved)"/></span></td>
+      <td width="20"><span class="@getIconColor(isSolved) puzzle-icon"><i class="@getIconClass(isSolved)"/></span></td>
       <td class="puzzle-title">
-        <a class="puzzle-link" href="javascript:void(1)">&nbsp;@problem.name</a>
+        <a class="puzzle-link pull-left" href="javascript:void(1)">&nbsp;@problem.name</a>
+        <span class="pull-right label label-info">@problem.category</span>
     </td>
   </tr>
   </table>
-  <!-- style="visibility:hidden; display: none; height: 0px; padding: 0px; margin: 0px;" -->
-  <div class="well hidden" >
-    <div class="description">@problem.description</div>
-    <div class="code-tests">
-      
-      <table>
-
-        @problem.tests.split("__split__").map{ t =>
-            @views.html.problems.puzzleContainerCodeTest(t)
-        }
-
-      </table>
-      </div>
-  </div>
 </div>
+<hr class="thin"/>

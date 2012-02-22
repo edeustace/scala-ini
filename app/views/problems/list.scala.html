@@ -36,30 +36,46 @@
 @countSolutions() = @{ solutions.size }
 
 @htmlSafe(s:String) = @{
-  var out = s.replace("\n", "\\n")
+  var out = s.replace("\\", "\\\\")
+  out = out.replace("\n", "\\n")
+  out = out.replace("\"", "\\\"")
+  println("htmlSafe: [" + s + "]")
   //TODO: weirdness with emitting html characters here..
-  out
+  Html(out)
+
 }
 
 @leftColumnContent = {
-<div class="padded-10 max-width">
-  <div>
-    <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
-  </div>
+
+<div class="info-box">
+    <span id="solvedInfo" class="pull-left" style="padding-top: 5px;"></span>
+      <span class="pull-right">
+        <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
+        <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
+      </span>
 </div>
 
-<pre id="editor">/* write your code here [Ctrl-R runs it]*/</pre>
+<div class="holder">
+  @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
+    @problems.map { 
+      case (problem) => {
+         @views.html.problems.puzzleContainer(problem, isSolved(problem, solutions))
+      }
+   }
+  }.getOrElse {)
+    <div class="well">
+       <em>Nothing to display</em>
+    </div>
+  }
+</div>
 
-<div class="errorBoxHolder padded-10">
-
-  <div id="errorBox" class="alert alert-error invisible">
-  </div>
-</div>  
 }
 
 
 @postBodyScript = {
 <script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
+<script type="text/javascript" src="/assets/javascripts/string-update-processor.js"></script>
+
 <script type="text/javascript">
   
   $(document).ready(function(){
@@ -67,9 +83,9 @@
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/twilight");
       editor.getSession().setTabSize(4);
-      editor.setHighlightActiveLine(false);
+      editor.setHighlightActiveLine(true);
       editor.setShowPrintMargin(false);
-      editor.renderer.setShowGutter(false);
+      editor.renderer.setShowGutter(true);
       var ScalaMode = ace.require("ace/mode/scala").Mode;
       editor.getSession().setMode(new ScalaMode());
       window.ace = (window.ace || {});
@@ -83,11 +99,25 @@
       existingSolutions["@s.problem_id"] = "@htmlSafe(s.solution)";
       } 
       
+      var problems = {};
+
+      @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
+        @problems.map { 
+          case (problem) => {
+            problems[@problem.id] = 
+              { code: "@htmlSafe(problem.tests)", 
+                title: "@problem.name",
+                description: "@problem.description" }
+          }
+       }
+      }.getOrElse {
+      }
+      
       @writeSolutionsToJsObject(solutions)
 
-        var view = new com.ee.ProblemsView("/problems/solve", 
-            editor, 
-            editor.getSession().getValue(),
+      var view = new com.ee.ProblemsView("/problems/solve_raw", 
+            editor,
+            problems, 
             existingSolutions
             );
 
@@ -119,30 +149,30 @@
 }
 
 @mainContent = {
-<div class="info-box">
-  <span id="solvedInfo" class="pull-left" style="padding-top: 5px;"></span>
-    <span class="pull-right">
-      <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
-      <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
-    </span>
-</div>
-<div class="puzzles-holder">
-  @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
-    @problems.map { 
-      case (problem) => {
-        <div class="padded-10 max-width">
-         @views.html.problems.puzzleContainer(problem, isSolved(problem, solutions))
-        </div>   
-      }
-   }
-  }.getOrElse {)
-    <div class="well">
-       <em>Nothing to display</em>
+
+<div class="editor-main-area">
+
+    <div class="padded-10 max-width run-bar">
+      <div>
+        <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
+        &nbsp;
+        <span class="title" id="main-puzzle-title"></span>
+        &nbsp;
+        -
+        <span class="subheader" id="main-puzzle-subheader"></span>
+      </div>
     </div>
-  }
-</div>
+
+    <pre id="editor">/* write your code here [Ctrl-R runs it]*/</pre>
+
+    <div class="errorBoxHolder padded-10">
+
+      <div id="errorBox" class="alert alert-error invisible">
+      </div>
+    </div> 
+  </div> 
 }
 
 
-@main(message, user)(mainContent)(postBodyScript, leftColumnContent) 
+@main("list new!", user)(mainContent)(postBodyScript, leftColumnContent) 
 
