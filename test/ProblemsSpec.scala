@@ -102,9 +102,17 @@ class ProblemsSpec extends Specification {
         */
         val solveAction : Action[AnyContent] = controllers.Problems.solveAndSubmit()
         
+        val args : Array[Tuple2[String,String]] = Array(
+          (Problems.Params.SOLUTION, solution),
+          (Problems.Params.NAME, "test puzzle"),
+          (Problems.Params.DESCRIPTION, "test description"),
+          (Problems.Params.LEVEL, "test level"),
+          (Problems.Params.CATEGORY, "test category")
+        )
+
         val solveResult = 
           solveAction.apply(
-            FakeRequest().withFormUrlEncodedBody(("solution",solution)) 
+            FakeRequest().withFormUrlEncodedBody( args: _* ) 
           )
           
         contentAsString(solveResult) must contain(response)

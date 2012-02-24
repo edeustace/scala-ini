@@ -19,8 +19,8 @@ object Problems extends Controller with Secured {
   val SUCCESS = "success"
   val MESSAGE = "message"
   val INVALID_SOLUTION_SYNTAX = "Error: you need to add " + PuzzleRegex.BEGIN + " and " + PuzzleRegex.END
-
-  val UNKNOWN_ERRROR = "An unknown error occured"
+  val MISSING_ALL_FORM_VARS = "You must supply a name, description, level and category"
+  val UNKNOWN_ERROR = "An unknown error occured"
   val SUBMITTED = "submitted!"
 
   val EXPECTED_TRUE_GOT_FALSE = "Expected true but got false"
@@ -88,21 +88,29 @@ object Problems extends Controller with Secured {
   }
 
   def solve() = Action { implicit request => 
-    val solution : String = getFormParameter( Params.SOLUTION) 
-    val response = _solve(solution)
+    
 
-    val user : User = getUser(request)
+    getFormParameter2( Params.SOLUTION )  match {
+      case None => Ok( toJson( buildResponse(false, ("message", "No solution provided"))))
+      case Some(solution) => {
+        val response = _solve(solution)
+        val user : User = getUser(request)
+        val isSolved = response \ SUCCESS
 
-    val isSolved = response \ SUCCESS
-    if( user != null && isSolved.as[Boolean] )
-    {
-      val id : String = getFormParameter( Params.ID )
+        if( user != null && isSolved.as[Boolean] ){
+         
+          getFormParameter2( Params.ID ) match {
+            case None =>
+            case Some(id) => {
+              var success : Boolean 
+                = UserSolution.create(user.email, id.toLong, solution)
+            }
+          }
+        }
 
-      var success : Boolean 
-        = UserSolution.create(user.email, id.toLong, solution)
+        Ok( toJson(response) )
+      }
     }
-
-    Ok( toJson( response) )
   }
 
   
@@ -113,41 +121,41 @@ object Problems extends Controller with Secured {
 
     if( isSolved.as[Boolean] )
     {
-      
       solution match 
       {
-          case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
+        case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
           
-            val description = getFormParameter( Params.DESCRIPTION )
-            val name = getFormParameter(  Params.NAME )
-            val level = getFormParameter(  Params.LEVEL )
-            val category = getFormParameter( Params.CATEGORY )
-            val user : User = getUser(request)
-            val u : Option[User]= User.findByEmail(request.session.get("email").getOrElse("ed.eustace@gmail.com"))
-            val email = u.getOrElse(User()).email
-            
-            val newPuzzle =  NewProblem(
-                  name,
-                  description,
-                  pre + "?" + post,
-                  level,
-                  category,
-                  email,
-                  puzzleSolution)
 
-            Problem.insert( newPuzzle )
+          getFormParameters(Params.DESCRIPTION, Params.NAME, Params.LEVEL, Params.CATEGORY) match {
+          
+            case List(Some(description), Some(name), Some(level), Some(category)) => {
+              val user : User = getUser(request)
+              val u : Option[User] =
+                 User.findByEmail(request.session.get("email").getOrElse("ed.eustace@gmail.com"))
+              val email = u.getOrElse(User()).email
+              
+              val newPuzzle =  NewProblem(
+                    name,
+                    description,
+                    pre + "?" + post,
+                    level,
+                    category,
+                    email,
+                    puzzleSolution)
 
-            Ok( toJson( buildResponse(true, (MESSAGE, SUBMITTED))))
+              Problem.insert( newPuzzle )
+
+              Ok( toJson( buildResponse(true, (MESSAGE, SUBMITTED))))
+
+            }
+            case _ => Ok( toJson( buildResponse(false, (MESSAGE, MISSING_ALL_FORM_VARS))))
           }
-          case _ => {
-            
-            Ok( toJson(buildResponse(false, (MESSAGE, INVALID_SOLUTION_SYNTAX))))
-          }
-
+        }
+        case _ => Ok( toJson(buildResponse(false, (MESSAGE, INVALID_SOLUTION_SYNTAX))))
       }
 
     }else{
-      Ok( toJson( buildResponse(false, (MESSAGE,UNKNOWN_ERRROR))))
+      Ok( toJson( buildResponse(false, (MESSAGE,UNKNOWN_ERROR))))
     }
 
   }
@@ -198,10 +206,31 @@ object Problems extends Controller with Secured {
     )
   }
 
+  //TODO: Tidy this up
+  private def getFormParameters( names : String* )( implicit request : Request[AnyContent]) : List[Option[String]] = {
+
+	  
+      val l = List.fromArray(names.toArray[String])
+      l match {
+    
+      case List() => List()
+      case _ => List(getFormParameter2(l.head)) ::: getFormParameters(l.tail.toArray[String] : _*)
+    }
+  }
+
 
   private def getFormParameter( name : String )(implicit request : Request[AnyContent] ) : String = {
     val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
     map.getOrElse(name, List[String]("null")).head
+  }
+
+  private def getFormParameter2( name : String )(implicit request : Request[AnyContent] ) : Option[String] = {
+    val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
+    val resultList : Option[Seq[String]] = map.get(name)
+    resultList match {
+      case None => None
+      case Some(list) => Some(list.head)
+    }
   }
 
   
