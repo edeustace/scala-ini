@@ -11,29 +11,43 @@ import play.api.libs.json._
 import play.api.libs.json.Json._
 import play.api._
 import play.api.mvc._
+import scala.util.matching.Regex
 
 object Problems extends Controller with Secured {
   
 
-  def ping() = Action{ request =>
+  val SUCCESS = "success"
+  val MESSAGE = "message"
+  val INVALID_SOLUTION_SYNTAX = "Error: you need to add " + PuzzleRegex.BEGIN + " and " + PuzzleRegex.END
 
-   
-    val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
-    
-    val one : Seq[String] = map.getOrElse("one", List[String]())
-    val two : Seq[String] = map.getOrElse("two", List[String]())
-    
-    Ok( 
-      toJson( 
-        JsObject(
-          List(
-            "one"->JsString(one.head),
-            "two"->JsString(two.head)
-          )
-        )
-      )
-    )
+  val UNKNOWN_ERRROR = "An unknown error occured"
+  val SUBMITTED = "submitted!"
+
+  val EXPECTED_TRUE_GOT_FALSE = "Expected true but got false"
+
+  
+
+  object PuzzleRegex{
+    val BEGIN = "/*<*/"
+    val END = "/*>*/"
+    def escape( s : String ) : String = s.replace("*", "\\*")
+    val ValidPuzzle = new Regex("(.*)" + escape(BEGIN) + "(.*)"+ escape(END) +"(.*)")
   }
+
+  object Params {
+    val SOLUTION = "solution"
+    val ID = "id"
+    val DESCRIPTION = "description"
+    val NAME = "name"
+    val LEVEL = "level" 
+    val CATEGORY = "category"
+  }
+  
+  def submitPuzzlePage = IsAuthenticated { username => _ =>
+    User.findByEmail(username).map{ user => 
+        Ok(views.html.problems.submitPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
+      }.getOrElse(Forbidden)
+    }
   /**
    * test authentication.
    */
@@ -65,10 +79,6 @@ object Problems extends Controller with Secured {
 
     )
   }
-
-  def testPage() = Action{ implicit request => 
-    Ok(views.html.problems.testPage())
-  }
   def show(id:String) = Action{ implicit request => 
 
     val userIsLoggedIn : Boolean = isLoggedIn(request)
@@ -77,10 +87,102 @@ object Problems extends Controller with Secured {
     Ok(views.html.problems.show("username", Problem.findById(id.toLong), getUser(request)))
   }
 
-  def solveRaw() = Action { implicit request => 
-    val solution : String = getFormParameter( request, "solution") 
-    val responseObject = _solve(solution)
-    Ok( toJson( responseObject) )
+  def solve() = Action { implicit request => 
+    val solution : String = getFormParameter( Params.SOLUTION) 
+    val response = _solve(solution)
+
+    val user : User = getUser(request)
+
+    val isSolved = response \ SUCCESS
+    if( user != null && isSolved.as[Boolean] )
+    {
+      val id : String = getFormParameter( Params.ID )
+
+      var success : Boolean 
+        = UserSolution.create(user.email, id.toLong, solution)
+    }
+
+    Ok( toJson( response) )
+  }
+
+  
+ def solveAndSubmit() = Action { implicit request =>
+    val solution : String = getFormParameter( Params.SOLUTION) 
+    val response = _solve(solution)
+    val isSolved = response \ SUCCESS
+
+    if( isSolved.as[Boolean] )
+    {
+      
+      solution match 
+      {
+          case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
+          
+            val description = getFormParameter( Params.DESCRIPTION )
+            val name = getFormParameter(  Params.NAME )
+            val level = getFormParameter(  Params.LEVEL )
+            val category = getFormParameter( Params.CATEGORY )
+            val user : User = getUser(request)
+            val u : Option[User]= User.findByEmail(request.session.get("email").getOrElse("ed.eustace@gmail.com"))
+            val email = u.getOrElse(User()).email
+            
+            val newPuzzle =  NewProblem(
+                  name,
+                  description,
+                  pre + "?" + post,
+                  level,
+                  category,
+                  email,
+                  puzzleSolution)
+
+            Problem.insert( newPuzzle )
+
+            Ok( toJson( buildResponse(true, (MESSAGE, SUBMITTED))))
+          }
+          case _ => {
+            
+            Ok( toJson(buildResponse(false, (MESSAGE, INVALID_SOLUTION_SYNTAX))))
+          }
+
+      }
+
+    }else{
+      Ok( toJson( buildResponse(false, (MESSAGE,UNKNOWN_ERRROR))))
+    }
+
+  }
+  private def _solve( solution : String ) : JsObject = {
+  
+    solution match {
+      case null => buildResponse(false, ("solution", solution))
+      case _ => {
+        
+        if( solution isEmpty )
+        {
+          return buildResponse(false, ("message", "solution is empty"))
+        }
+
+        Logger.debug("Problems.solve :: apply: ["+ solution+"]")
+        
+        var result = false
+        var message = ""
+
+        try
+        {
+          result = (new Eval).apply[Boolean](solution)
+        }
+        catch
+        {
+          case ex: Exception => message = ex.getMessage() 
+        }
+        
+        if( !result )
+        {
+          message = EXPECTED_TRUE_GOT_FALSE
+        }
+        buildResponse(result, ("message", message), ("solution", solution))
+      }
+    }
   }
 
   private def buildResponse( success : Boolean, t : Tuple2[String,String]* ) : JsObject = {
@@ -96,104 +198,11 @@ object Problems extends Controller with Secured {
     )
   }
 
-  private def _solve( solution : String ) : JsObject = {
-  
-    solution match {
-      case null => buildResponse(false, ("solution", solution))
-      case _ => {
-        
-        if( solution isEmpty )
-        {
-          return buildResponse(false, ("message", "solution is empty"))
-        }
 
-        Logger.debug("Problems._solve :: apply: ["+ solution+"]")
-        
-        var result = false
-        var message = ""
-
-        try
-        {
-          result = (new Eval).apply[Boolean](solution)
-        }
-        catch
-        {
-          case ex: Exception => message = ex.getMessage() 
-        }
-
-        buildResponse(result, ("message", message), ("solution", solution))
-      }
-    }
-  }
-
-  private def getFormParameter(  request : Request[AnyContent], name : String ) : String = {
+  private def getFormParameter( name : String )(implicit request : Request[AnyContent] ) : String = {
     val map : Map[String,Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map())
-    map.getOrElse(name, List[String]()).head
+    map.getOrElse(name, List[String]("null")).head
   }
 
-  def solve() = Action{ implicit  request =>
-    
-    val id : String = getFormParameter( request, "id" )
-    val solution : String = getFormParameter( request, "solution") 
-    
-    Logger.debug("Problems.solve ::: id: " + id + " solution: ["+solution+"]")
-    
-    val problem : Problem = Problem.findById(id.toLong)
-    val test = problem.tests
-    
-    if( solution.isEmpty )
-    {
-      Ok(
-        toJson(
-          buildResponse(false, ("solution", solution))
-	      )    
-      )
-    }
-    else
-    {
-      val withSolution : String = test.replace("?", solution )
-	    var result : Boolean = false;
-	    var exceptionMessage : String = ""
-	    try
-	    {
-        Logger.debug("Problems.solve :: apply: ["+ withSolution+"]")
-	    	result = (new Eval).apply[Boolean](withSolution)
-	    }
-	    catch
-	    {
-	      case ex: Exception => exceptionMessage = ex.getMessage() 
-	    }
-
-      if( result )
-      {
-        val user : User = getUser(request)
-
-        if( user != null )
-        {
-          var success : Boolean = UserSolution.create(user.email, id.toLong, solution)
-        }
-      }
-      else
-      {
-        if( exceptionMessage.isEmpty )
-        {
-          exceptionMessage = "not equal [" + withSolution + "]"
-        }
-      }
-      
-	    
-	    Ok(
-	        toJson(
-	            JsObject(
-	                List(  "success"->JsBoolean(result), 
-                        "solution"->JsString(solution), 
-                        "exception" -> JsString(exceptionMessage) 
-                      )
-	            )
-	        )
-	    )
-	    
-    }
-  }
   
 }

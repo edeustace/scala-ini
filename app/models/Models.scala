@@ -8,7 +8,24 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
-case class Problem(id: Pk[Long], name: String, description: String, tests: String, level : String, category : String )
+case class Problem(id: Pk[Long], 
+                  name: String, 
+                  description: String, 
+                  tests: String, 
+                  level : String, 
+                  category : String, 
+                  user_email : String,
+                  user_name : String,
+                  solution: Option[String] )
+
+case class NewProblem(name: String, 
+                  description: String, 
+                  tests: String, 
+                  level : String, 
+                  category : String, 
+                  user_email : String,
+                  solution: String )
+
 
 /**
  * Helper for pagination.
@@ -47,11 +64,27 @@ object Problem {
     get[String]("problem.description") ~
     get[String]("problem.tests") ~
     get[String]("problem.level") ~
-    get[String]("problem.category") map {
-      case id~name~description~tests~level~category => Problem(id, name, description, tests, level, category)
+    get[String]("problem.category") ~
+    get[String]("problem.user_email") ~
+    get[String]("user.name") ~
+    get[Option[String]]("problem.solution") map {
+      case id~name~description~tests~level~category~user_email~user_name~solution => Problem(id, name, description, tests, level, category, user_email, user_name, solution)
     }
   }
-  
+  /*
+  val simpleWithUserName = {
+    get[Pk[Long]]("problem.id") ~
+    get[String]("problem.name") ~
+    get[String]("problem.description") ~
+    get[String]("problem.tests") ~
+    get[String]("problem.level") ~
+    get[String]("problem.category") ~
+    get[String]("user.name") ~
+    get[Option[String]]("problem.solution") map {
+      case id~name~description~tests~level~category~username~solution => Problem(id, name, description, tests, level, category, username, solution)
+    }
+  }
+  */
   // -- Queries
   
   /**
@@ -59,11 +92,15 @@ object Problem {
    */
   def findById(id: Long): Problem = {
     val opt : Option[Problem] = DB.withConnection { implicit connection =>
-      SQL("select * from problem where id = {id}").on('id -> id).as(Problem.simple.singleOpt )
+      SQL("""select * from problem as problem 
+              inner JOIN user as user
+              on user.email = problem.user_email
+              where id = {id}""").on('id -> id).as(Problem.simple.singleOpt )
     }
     opt.get
   }
-  
+
+ 
   /**
    * Return a page of (Problem,Company).
    *
@@ -83,7 +120,9 @@ object Problem {
       
       val problems = SQL(
         """
-          select * from problem 
+          select * from problem as problem 
+              inner JOIN user as user
+              on user.email = problem.user_email
           where problem.name like {filter}
           order by {orderBy} nulls last
           limit {pageSize} offset {offset}
@@ -138,13 +177,13 @@ object Problem {
    *
    * @param problem The problem values.
    */
-  def insert(problem: Problem) = {
+  def insert(problem: NewProblem) = {
     DB.withConnection { implicit connection =>
       SQL(
         """
           insert into problem values (
             (select next value for problem_seq), 
-            {name}, {description}, {tests}, {level}, {category}
+            {name}, {description}, {tests}, {level}, {category}, {user_email}, {solution}
           )
         """
       ).on(
@@ -152,7 +191,9 @@ object Problem {
         'description -> problem.description,
         'tests -> problem.tests,
         'level -> problem.level,
-        'category -> problem.category
+        'category -> problem.category,
+        'user_email -> problem.user_email,
+        'solution -> problem.solution
       ).executeUpdate()
     }
   }

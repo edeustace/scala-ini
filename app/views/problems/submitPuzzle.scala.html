@@ -1,0 +1,153 @@
+@(puzzleStart : String, puzzleEnd: String)
+
+@leftColumnContent = {
+
+ <div class="info-box-light">
+  <form class="form-horizontal">
+        <fieldset>
+          
+          <div class="control-group">
+            <label>Name</label>
+            <div class="controls">
+              <input type="text" id="nameInput">
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Description</label>
+            <div class="controls">
+              <input type="text" id="descriptionInput">
+            </div>
+          </div>
+          <div class="control-group">
+            <label>Category</label>
+            <div class="controls">
+              <select id="categorySelect">
+                <option>Lists</option>
+                <option>Collections</option>
+                <option>Functions</option>
+                <option>Tuples</option>
+                <option>Traits</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Level</label>
+            <div class="controls">
+              <select id="levelSelect">
+                <option>Easy</option>
+                <option>Easy-ish</option>
+                <option>Middling</option>
+                <option>Tricksy</option>
+                <option>WTF?</option>
+              </select>
+            </div>
+          </div>
+          
+        </fieldset>
+      </form>
+
+      <br/>
+      <hr class="thin"/>
+      <br/>
+      <div >
+      <h4>Help</h4>
+    <p>
+      Submitting a puzzle is easy. Write some code in the editor where the last line evaluates to a Boolean.
+      Then to turn it into a puzzle, just surround the code that you want to hide from the user with: <code>@Html(puzzleStart)</code> and <code>@Html(puzzleEnd)</code>. Eg: 
+    </p>
+    <div class="well"><code>@Html(puzzleStart)true@Html(puzzleEnd) == true</code></div>
+    <p>Will create a puzzle like:</p>
+    <div class="well"><code>? == true</code></div>
+    <p>
+    There are 2 buttons: "Test" just tests your code. "Test then submit" tests your code and if its successful (aka the last line evaluates to true), it'll be submitted.</p>
+    The code will not be visible on the site until it has been evaluated</p>
+    </p>
+  </div> 
+</div>
+
+  
+
+}
+
+
+@postBodyScript = {
+<script type="text/javascript" src="@routes.Assets.at("javascripts/SubmitPuzzleView.js")"></script>
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+      
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/twilight");
+      editor.getSession().setTabSize(4);
+      editor.setHighlightActiveLine(true);
+      editor.setShowPrintMargin(false);
+      editor.renderer.setShowGutter(true);
+      var ScalaMode = ace.require("ace/mode/scala").Mode;
+      editor.getSession().setMode(new ScalaMode());
+      window.ace = (window.ace || {});
+      window.ace.editor = editor;
+
+      console.log("setting url to: /problems/solve")
+
+      var existingSolutions = {};
+
+      var view = new com.ee.SubmitPuzzleView(
+          "/problems/solve",
+          "/problems/new/submit", 
+          editor, 
+          editor.getSession().getValue(),
+          "@Html(puzzleStart)",
+          "@Html(puzzleEnd)");
+      
+      editor.commands.addCommand({
+          name: 'myCommand',
+          bindKey: {
+              win: 'Ctrl-R',
+              mac: 'Ctrl-R',
+              sender: 'editor'
+          },
+          exec: function(env, args, request) {
+            view.runCode();
+          }
+      });
+  });
+</script>
+
+
+}
+
+@mainContent = {
+
+<div class="editor-main-area">
+  <div class="padded-10 max-width run-bar">
+    <div>
+      <a href="javascript:void(1)" id="testButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test</a>
+      <a href="javascript:void(1)" id="testAndSubmitButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test and Submit</a>
+        &nbsp;
+        <span class="title" id="main-puzzle-title">Submit a Puzzle</span>
+        &nbsp;
+        -
+        <span class="subheader" id="main-puzzle-subheader">ooh!</span>
+    </div>
+    <div>
+    
+      
+  </div>
+
+  </div>
+
+ 
+  <pre id="editor" >/* write your code here [Ctrl-R runs it]*/</pre>
+
+  <div class="errorBoxHolder padded-10">
+    <div id="successBox" class="alert alert-success invisible"></div>
+    <div id="errorBox" class="alert alert-error invisible">
+    </div>
+  </div>  
+</div>
+}
+
+
+@main("Submit a Puzzle", null)(mainContent)(postBodyScript, leftColumnContent) 
+

@@ -7,9 +7,15 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.Logger
 
+
 class ProblemsSpec extends Specification {
   
   import models._
+  import controllers._
+
+  val beginTag = Problems.PuzzleRegex.BEGIN 
+  val endTag = Problems.PuzzleRegex.END
+
 
   // -- Date helpers
   
@@ -54,10 +60,63 @@ class ProblemsSpec extends Specification {
         val result : Action[AnyContent] = controllers.Problems.solve()
         
         val actualResult = result.apply(FakeRequest().withFormUrlEncodedBody(("id","1"), ("solution",solution)) )
-        contentAsString(actualResult) must contain("not equal [false == true]")
+        contentAsString(actualResult) must contain(controllers.Problems.EXPECTED_TRUE_GOT_FALSE)
         System.out.println(contentAsString(actualResult))
         status(actualResult) must equalTo(OK)
       }
     }
+
+    "solveAndSubmit should return invalid syntax for puzzle none" in{
+      val solution = """true == true"""
+      assertSolveResponse( solution,controllers.Problems.INVALID_SOLUTION_SYNTAX )
+    }
+
+    "solveAndSubmit should return invalid syntax for puzzle no end" in{
+      val solution = beginTag + "true == true"
+      assertSolveResponse( solution,controllers.Problems.INVALID_SOLUTION_SYNTAX )
+    }
+
+    "solveAndSubmit should return invalid syntax for puzzle no begin" in{
+      val solution = "true" + endTag + "== true"
+      assertSolveResponse( solution,controllers.Problems.INVALID_SOLUTION_SYNTAX )
+    }
+
+    def assertSolveResponse( solution : String, response : String ) = {
+      
+      
+      
+      
+
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      
+        /*
+        //TODO: How to login during testing
+        val signupAction : Action[AnyContent] = controllers.Application.completeSignup()
+
+        val signupResult = signupAction.apply(
+          FakeRequest().withFormUrlEncodedBody(
+            ("email", "ed.eustace@gmail.com"),
+            ("password", "password")
+            )
+        )
+        */
+        val solveAction : Action[AnyContent] = controllers.Problems.solveAndSubmit()
+        
+        val solveResult = 
+          solveAction.apply(
+            FakeRequest().withFormUrlEncodedBody(("solution",solution)) 
+          )
+          
+        contentAsString(solveResult) must contain(response)
+        System.out.println(contentAsString(solveResult))
+        status(solveResult) must equalTo(OK)
+      }
+    }
+    
+    "solveAndSubmit should return solved for puzzle with valid syntax" in{
+      val solution = beginTag + "true" + endTag + "== true"
+      assertSolveResponse( solution,controllers.Problems.SUBMITTED )
+    }
+   
   }
 }

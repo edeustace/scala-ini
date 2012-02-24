@@ -3,6 +3,7 @@
 # --- !Ups
 
 insert into user (email,name,password) values ('ed.eustace@gmail.com','ed eustace','password');
+insert into user (email,name,password) values ('edeustace@yahoo.com','ed eustace','password');
 
 insert into problem (id,name,description,tests,level,category,user_email) 
 	values (1,'True is true','What is true equal to?','? == true','easy', 'boolean', 'ed.eustace@gmail.com');

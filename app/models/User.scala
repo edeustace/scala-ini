@@ -5,6 +5,7 @@ import play.api.Play.current
 import play.api.Logger
 import anorm._
 import anorm.SqlParser._
+import play.api.libs._
 
 case class UserSolution(id: Pk[Long], user_email:String, problem_id:Long, solution:String)
 
@@ -84,7 +85,8 @@ object UserSolution{
 }
 
 
-case class User(email: String, name: String, password: String, solutionCount : Long = -1)
+case class User(email: String = "", name: String = "", password: String = "", solutionCount : Long = -1)
+//case class NullUser(email:String = "", name : String = "", password : String = "", solutionCount :Long= -1) < User
 
 object User {
   
@@ -170,7 +172,7 @@ object User {
         """
       ).on(
         'email -> email,
-        'password -> password
+        'password -> Codecs.sha1(password)
       ).as(User.simple.singleOpt)
     }
   }
@@ -189,12 +191,28 @@ object User {
       ).on(
         'email -> user.email,
         'name -> user.name,
-        'password -> user.password
+        'password -> Codecs.sha1(user.password)
       ).executeUpdate()
       
       user
       
     }
+  }
+
+  def updatePassword(email:String, password:String) : Int = {
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          update user
+          set password = {password}
+          where email = {email}
+        """
+      ).on(
+        'email -> email,
+        'password -> password
+      ).executeUpdate()
+    }
+
   }
 
    /**

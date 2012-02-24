@@ -35,6 +35,10 @@ create table user_solution(
 );
 
 
+create sequence problem_seq start with 1000;
+
+
+
 # --- !Downs
 
 SET REFERENTIAL_INTEGRITY FALSE;

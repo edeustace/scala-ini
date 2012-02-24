@@ -1,6 +1,28 @@
 window.com = (window.com || {})
 com.ee = (com.ee || {})
 
+class @com.ee.RunButton 
+  constructor: (@id, @clickHandler) ->
+    $(@id).click (e) => 
+      return if $(@id).hasClass("disabled")
+      @clickHandler e
+  
+  loading: (isLoading) ->
+    if isLoading
+      $(@id)
+        .addClass("disabled")
+        .find("i")
+        .removeClass("icon-play")
+        .addClass("icon-cog")
+    else
+      $(@id)
+        .removeClass("disabled")
+        .find("i")
+        .removeClass("icon-cog")
+        .addClass("icon-play")
+    null      
+
+
 class @com.ee.ProblemsView
 
   ###
@@ -18,6 +40,7 @@ class @com.ee.ProblemsView
     console.log "ProblemsView constructor solveUrl: #{@solveUrl}"
     @processor = new com.ee.string.StringUpdateProcessor()
     @hook = new com.ee.string.AceEditorHook @editor, @processor
+    @runButton = new com.ee.RunButton("#runButton", (e) => @onRunButtonClick e)
     null
 
   ###
@@ -28,7 +51,6 @@ class @com.ee.ProblemsView
   init: (problemId, @solvedSoFar, @totalProblems )->
     @problemId = problemId
     console.log "init with id: #{@problemId}"
-    @bindListenerToRunButton()
     @bindListenersToEditor()
     @initPuzzleLinks()
     @initPreviousNextButtons()
@@ -40,6 +62,8 @@ class @com.ee.ProblemsView
   # Run the typed code against the server
   ###
   runCode: ->
+    @runButton.loading true
+
     params = 
       id: @problemId, 
       solution: window.ace.editor.getSession().getValue()
@@ -49,6 +73,23 @@ class @com.ee.ProblemsView
         (data, textStatus,jqXHR) => @handleRunResponse data
       )
     null
+
+  handleRunResponse: (data) ->
+    @runButton.loading false
+
+    if data.success == true 
+      console.log "success"
+      @markTestSuccessful()
+      @storeSolution data.solution
+      @moveToNextProblem()
+      @updateSolvedInfo 1
+    else 
+      console.log "failure: #{data.message}"
+      $("#errorBox")
+        .html("Error: #{data.message}")
+        .removeClass('invisible')
+    null
+
 
   bindListenersToEditor: ->
     @editor.getSession().on 'change', (e) => @onEditorChange e
@@ -76,9 +117,7 @@ class @com.ee.ProblemsView
       .addClass("invisible")
     null
 
-  bindListenerToRunButton: ->
-    $("#runButton").click( (e) => @onRunButtonClick e)
-    null
+  
   
   onRunButtonClick: (e) ->
     console.log "onRunButtonClick"
@@ -97,20 +136,7 @@ class @com.ee.ProblemsView
     null
 
 
-  handleRunResponse: (data) ->
-    console.log(data)
-    if data.success == true 
-      console.log "success"
-      @markTestSuccessful()
-      @storeSolution data.solution
-      @moveToNextProblem()
-      @updateSolvedInfo 1
-    else 
-      console.log "failure: #{data.exception}"
-      $("#errorBox")
-        .html("Error: #{data.exception}")
-        .removeClass('invisible')
-    null
+  
 
   markTestSuccessful: ->
     $("#_problem_#{@problemId}")
@@ -125,34 +151,31 @@ class @com.ee.ProblemsView
     @existingSolutions[@problemId.toString()] = solution
     null
 
-  moveToNextProblem: ->
-    if @canMoveToNext()
-      @moveToProblem( parseInt(@problemId) + 1)   
-    null
-  
-  canMoveToNext: ->
-    @nodeExists( parseInt(@problemId) + 1)
-
-  canMoveToPrevious: ->
-    @nodeExists( parseInt(@problemId) - 1)
-  
-  nodeExists: (id) ->
-    $("#_problem_#{id}").length == 1
-
   moveToProblem: (newProblemId) ->
     @problemId = newProblemId
-    $("#main-puzzle-title").html(@problems[@problemId].title)
-    $("#main-puzzle-subheader").html(@problems[@problemId].description)
+    problem = @_getProblemForProblemId() 
+    $("#main-puzzle-title").html(problem.title)
+
+    subheader = "#{problem.description} by #{problem.user}"
+    $("#main-puzzle-subheader").html(subheader)
 
     $(".puzzle-container").removeClass("selected")
     $("#_problem_#{@problemId}").addClass("selected")
     @updateEditor()
     null
 
+  _getProblemForProblemId: ->
+    problemIndex = @getCurrentProblemArrayIndex()
+    @problems[problemIndex]
+  
 
   updateEditor: ->
-    code = @problems[@problemId].code
-    @processor.init code
+
+    problem = @_getProblemForProblemId @problemId
+    code = problem.code
+
+    if @processor?
+      @processor.init code
         
     if @existingSolutions[@problemId]?
       @editor.getSession().setValue @existingSolutions[@problemId]
@@ -176,21 +199,53 @@ class @com.ee.ProblemsView
         $(id).addClass("disabled")
       null
     
-    updateButton.call this, "#prevButton", @canMoveToPrevious 
-    updateButton.call this, "#nextButton", @canMoveToNext
+    updateButton.call this, "#prevButton", ->
+       nextId = @getNextId(-1)
+       nextId != -1
+    updateButton.call this, "#nextButton", ->
+      @getNextId(1) != -1 
     null
 
+
+  moveToNextProblem: ->
+    @_onPrevNextClick 1
+    null
+  
   onPrevClick: (e) ->
-    return if !@canMoveToPrevious()
-    @moveToProblem( parseInt(@problemId) - 1 )
-    @updatePrevNextButtons()
+    @_onPrevNextClick -1
     null
 
   onNextClick: (e) ->
-    return if !@canMoveToNext()
-    @moveToNextProblem()
+    @_onPrevNextClick 1
+    null
+
+  _onPrevNextClick: (increment) ->
+    nextId = @getNextId increment
+    return if nextId == -1
+    @moveToProblem nextId 
     @updatePrevNextButtons()
     null
+
+ 
+  getNextId: (increment) ->
+    realIndex = @getCurrentProblemArrayIndex()
+    newIndex =  realIndex + increment
+    @getProblemIdAtIndex newIndex
+
+  getProblemIdAtIndex: (arrayIndex) ->
+    problem = @problems[arrayIndex]
+
+    if problem?
+      problem.id
+    else
+      -1
+
+  getCurrentProblemArrayIndex: ->
+    for index, problem of @problems
+      if problem.id == @problemId
+        return parseInt(index)
+    
+    throw "Can't find array index for problem id: #{@problemId}"
 
   updateSolvedInfo: (increment)->
     @solvedSoFar += increment if @solvedSoFar < @totalProblems

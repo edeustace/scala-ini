@@ -61,7 +61,7 @@
       case (problem) => {
          @views.html.problems.puzzleContainer(problem, isSolved(problem, solutions))
       }
-   }
+    }
   }.getOrElse {)
     <div class="well">
        <em>Nothing to display</em>
@@ -99,15 +99,19 @@
       existingSolutions["@s.problem_id"] = "@htmlSafe(s.solution)";
       } 
       
-      var problems = {};
+      var problems = [];
 
       @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
         @problems.map { 
           case (problem) => {
-            problems[@problem.id] = 
-              { code: "@htmlSafe(problem.tests)", 
+            
+            var problemData =  { 
+                id: @problem.id,
+                code: "@htmlSafe(problem.tests)", 
                 title: "@problem.name",
-                description: "@problem.description" }
+                description: "@problem.description",
+                user: "@problem.user_name" }
+            problems.push(problemData)
           }
        }
       }.getOrElse {
@@ -115,7 +119,7 @@
       
       @writeSolutionsToJsObject(solutions)
 
-      var view = new com.ee.ProblemsView("/problems/solve_raw", 
+      var view = new com.ee.ProblemsView("/problems/solve", 
             editor,
             problems, 
             existingSolutions
@@ -154,7 +158,7 @@
 
     <div class="padded-10 max-width run-bar">
       <div>
-        <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Run</a>
+        <a href="javascript:void(1)" id="runButton" class="btn btn-primary btn-large"><i class="icon-play icon-white"></i> Run</a>
         &nbsp;
         <span class="title" id="main-puzzle-title"></span>
         &nbsp;
@@ -174,5 +178,5 @@
 }
 
 
-@main("list new!", user)(mainContent)(postBodyScript, leftColumnContent) 
+@main(message, user)(mainContent)(postBodyScript, leftColumnContent) 
 
