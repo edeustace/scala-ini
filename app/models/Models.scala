@@ -8,23 +8,32 @@ import play.api.Play.current
 import anorm._
 import anorm.SqlParser._
 
+object ProblemMasker {
+
+
+  def mask(s:String) : String = {
+
+    val expr = """(?s)/\*<\*/.*?/\*>\*/""".r
+    expr.replaceAllIn( s, "?" )
+  }
+
+
+}
 case class Problem(id: Pk[Long], 
                   name: String, 
                   description: String, 
-                  tests: String, 
+                  body: String, 
                   level : String, 
                   category : String, 
                   user_email : String,
-                  user_name : String,
-                  solution: Option[String] )
+                  user_name : String)
 
 case class NewProblem(name: String, 
                   description: String, 
-                  tests: String, 
+                  body: String, 
                   level : String, 
                   category : String, 
-                  user_email : String,
-                  solution: String )
+                  user_email : String )
 
 
 /**
@@ -62,29 +71,17 @@ object Problem {
     get[Pk[Long]]("problem.id") ~
     get[String]("problem.name") ~
     get[String]("problem.description") ~
-    get[String]("problem.tests") ~
+    get[String]("problem.body") ~
     get[String]("problem.level") ~
     get[String]("problem.category") ~
     get[String]("problem.user_email") ~
-    get[String]("user.name") ~
-    get[Option[String]]("problem.solution") map {
-      case id~name~description~tests~level~category~user_email~user_name~solution => Problem(id, name, description, tests, level, category, user_email, user_name, solution)
+    get[String]("user.name")  map {
+      case id~name~description~body~level~category~user_email~user_name 
+        => Problem(id, name, description, ProblemMasker.mask(body), level, category, user_email, user_name)
     }
   }
-  /*
-  val simpleWithUserName = {
-    get[Pk[Long]]("problem.id") ~
-    get[String]("problem.name") ~
-    get[String]("problem.description") ~
-    get[String]("problem.tests") ~
-    get[String]("problem.level") ~
-    get[String]("problem.category") ~
-    get[String]("user.name") ~
-    get[Option[String]]("problem.solution") map {
-      case id~name~description~tests~level~category~username~solution => Problem(id, name, description, tests, level, category, username, solution)
-    }
-  }
-  */
+ 
+  
   // -- Queries
   
   /**
@@ -160,14 +157,14 @@ object Problem {
       SQL(
         """
           update problem
-          set name = {name}, description = {description}, tests = {tests}
+          set name = {name}, description = {description}, body = {body}
           where id = {id}
         """
       ).on(
         'id -> id,
         'name -> problem.name,
         'description -> problem.description,
-        'tests -> problem.tests
+        'body -> problem.body
       ).executeUpdate()
     }
   }
@@ -183,17 +180,16 @@ object Problem {
         """
           insert into problem values (
             (select next value for problem_seq), 
-            {name}, {description}, {tests}, {level}, {category}, {user_email}, {solution}
+            {name}, {description}, {body}, {level}, {category}, {user_email}
           )
         """
       ).on(
         'name -> problem.name,
         'description -> problem.description,
-        'tests -> problem.tests,
+        'body -> problem.body,
         'level -> problem.level,
         'category -> problem.category,
-        'user_email -> problem.user_email,
-        'solution -> problem.solution
+        'user_email -> problem.user_email
       ).executeUpdate()
     }
   }

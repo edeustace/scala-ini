@@ -39,10 +39,7 @@
   var out = s.replace("\\", "\\\\")
   out = out.replace("\n", "\\n")
   out = out.replace("\"", "\\\"")
-  println("htmlSafe: [" + s + "]")
-  //TODO: weirdness with emitting html characters here..
   Html(out)
-
 }
 
 @leftColumnContent = {
@@ -107,7 +104,7 @@
             
             var problemData =  { 
                 id: @problem.id,
-                code: "@htmlSafe(problem.tests)", 
+                code: "@htmlSafe(problem.body)", 
                 title: "@problem.name",
                 description: "@problem.description",
                 user: "@problem.user_name" }

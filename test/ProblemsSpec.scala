@@ -2,6 +2,7 @@ package test
 
 import org.specs2.mutable._
 import play.api.test._
+import com.ee._
 import play.api.test.Helpers._
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -25,6 +26,21 @@ class ProblemsSpec extends Specification {
   
   "Application" should {
     
+   
+  
+  "generate json" in {
+
+      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      
+        val result : Action[AnyContent] = controllers.Problems.jsonTest()
+        
+        val actualResult = result.apply(FakeRequest())
+        status(actualResult) must equalTo(OK)
+        contentAsString(actualResult) must equalTo("{\"name\":\"blah\"}")
+      }
+    }
+  
+  
     "show the problem list on  /" in {
 
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
@@ -36,18 +52,21 @@ class ProblemsSpec extends Specification {
       }
     }
 
-     "show be able to handle + symbol  /" in {
+    "be able to handle multiple evaluations" in {
 
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
       
-        val solution = """((n:String) => "Hello, " + n + "!")"""
-        System.out.println("solution: " + solution)
-        val result : Action[AnyContent] = controllers.Problems.solve()
+        val solution = """def plusOne(x:Int) = x + 1
         
-        val request = FakeRequest().withFormUrlEncodedBody(("id", "8"), ("solution", solution))
+        plusOne(1) == 2
+
+        plusOne(2) == 3
+        """
+        val result : Action[AnyContent] = controllers.Problems.solve()
+        val request = FakeRequest().withFormUrlEncodedBody( ("solution", solution))
         val actualResult = result.apply(request)
-        contentAsString(actualResult) must contain("success")
-        System.out.println(contentAsString(actualResult))
+
+        contentAsString(actualResult) must contain( PuzzleEvaluator.getSummary(2,0))
         status(actualResult) must equalTo(OK)
       }
     }
@@ -60,8 +79,7 @@ class ProblemsSpec extends Specification {
         val result : Action[AnyContent] = controllers.Problems.solve()
         
         val actualResult = result.apply(FakeRequest().withFormUrlEncodedBody(("id","1"), ("solution",solution)) )
-        contentAsString(actualResult) must contain(controllers.Problems.EXPECTED_TRUE_GOT_FALSE)
-        System.out.println(contentAsString(actualResult))
+        contentAsString(actualResult) must contain(PuzzleEvaluator.getSummary(0,1))
         status(actualResult) must equalTo(OK)
       }
     }
@@ -83,10 +101,6 @@ class ProblemsSpec extends Specification {
 
     def assertSolveResponse( solution : String, response : String ) = {
       
-      
-      
-      
-
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
       
         /*

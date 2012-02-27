@@ -24,6 +24,23 @@ class ProblemSpec extends Specification {
         trueIsTrue.name must equalTo("True is true")
       }
     }
-}    
+  } 
+
+  "ProbleMasker" should {
+
+    "replace all tags" in {
+
+      ProblemMasker.mask("/*<*/hello/*>*/") must equalTo("?")
+
+
+      val masked = ProblemMasker.mask("""/*<*/hello/*>*/ 
+        /*<*/hel
+        lo/*>*/ 
+        /*<*/hello/*>*/""") 
+
+      println("masked: [" + masked + "]")
+      masked.count(_ == '?' ) must equalTo(3)
+    }
+  }   
   
 }
