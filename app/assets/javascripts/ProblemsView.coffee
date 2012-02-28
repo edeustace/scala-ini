@@ -178,6 +178,8 @@ class @com.ee.ProblemsView
     null
 
   moveToProblem: (newProblemId) ->
+
+    @clearEvaluations()
     @problemId = newProblemId
     problem = @_getProblemForProblemId() 
     $("#main-puzzle-title").html(problem.title)

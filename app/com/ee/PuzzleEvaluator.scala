@@ -85,10 +85,6 @@ object PuzzleEvaluator
 
   private def applyEvaluation( decomposedString : DecomposedString ) : SingleEvaluationResult = {
 
-      Logger.debug(" --> applyEvaluation")
-      Logger.debug(decomposedString.value)
-      Logger.debug(" <-- applyEvaluation")
-
       val result = (new Eval).apply[Boolean](decomposedString.value)
       result match {
         case true => SingleEvaluationResult(true, decomposedString.line)  
