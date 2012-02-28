@@ -21,7 +21,7 @@ class ProblemSpec extends Specification {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
         
         val trueIsTrue = Problem.findById(1)
-        trueIsTrue.name must equalTo("True is true")
+        trueIsTrue.user_email must equalTo("ed.eustace@gmail.com")
       }
     }
   } 

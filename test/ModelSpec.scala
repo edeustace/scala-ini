@@ -21,8 +21,6 @@ class ModelSpec extends Specification {
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
         
         val prob = Problem.findById(1)
-        //println("found prob: " + prob) 
-        prob.name must equalTo("True is true")
         prob.user_email must equalTo("ed.eustace@gmail.com")
         prob.user_name must equalTo("ed eustace")
         

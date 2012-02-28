@@ -1,6 +1,7 @@
 package com.ee 
 
 import com.twitter.util.Eval
+import play.api._
 
 case class EvaluationResult(successful:Boolean, summary:String, evaluations : List[SingleEvaluationResult] = List()  )
 case class SingleEvaluationResult(successful:Boolean = true, line:Int = -1, message : String = "")
@@ -83,6 +84,11 @@ object PuzzleEvaluator
   }
 
   private def applyEvaluation( decomposedString : DecomposedString ) : SingleEvaluationResult = {
+
+      Logger.debug(" --> applyEvaluation")
+      Logger.debug(decomposedString.value)
+      Logger.debug(" <-- applyEvaluation")
+
       val result = (new Eval).apply[Boolean](decomposedString.value)
       result match {
         case true => SingleEvaluationResult(true, decomposedString.line)  

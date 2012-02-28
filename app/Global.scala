@@ -21,7 +21,7 @@ object Global extends GlobalSettings {
         val u = User.findByEmail(email)
         val user = u.getOrElse(User())
         u match {
-          case None => ////println("ignoring: " + email)
+          case None => println("ignoring: " + email)
           case Some(u) => {
             val hashed = Codecs.sha1(u.password)
             User.updatePassword( u.email, hashed)

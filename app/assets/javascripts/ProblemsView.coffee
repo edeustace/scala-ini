@@ -77,19 +77,50 @@ class @com.ee.ProblemsView
   handleRunResponse: (data) ->
     @runButton.loading false
 
-    if data.success == true 
+    console.log data
+    
+    if data.successful == true 
       console.log "success"
       @markTestSuccessful()
-      @storeSolution data.solution
-      @moveToNextProblem()
+      @storeSolution @editor.getSession().getValue()
+
+      setTimeout( => 
+        @clearEvaluations()
+        @moveToNextProblem()
+      , 1000 )
+      
       @updateSolvedInfo 1
     else 
-      console.log "failure: #{data.message}"
+      console.log "failure: #{data.result.summary}"
       $("#errorBox")
-        .html("Error: #{data.message}")
+        .html("Error: #{data.result.summary}")
         .removeClass('invisible')
+
+    if data.result.evaluations?
+      @showEvaluationsInEditor(data.result.evaluations) 
     null
 
+
+  clearEvaluations: ->
+    if @lastEvaluations?
+      for oldEvalution in @lastEvaluations
+        type = @_type oldEvalution.successful 
+        @editor.renderer.removeGutterDecoration oldEvalution.line, type 
+    null
+
+  showEvaluationsInEditor: (evaluations) ->
+    @clearEvaluations()
+    annotations = []
+
+    for evaluation in evaluations
+      type =  @_type evaluation.successful 
+      @editor.renderer.addGutterDecoration evaluation.line, type
+
+    @lastEvaluations = evaluations
+    null
+
+  _type: (successful) ->
+      if successful then "passed" else "failed"
 
   bindListenersToEditor: ->
     @editor.getSession().on 'change', (e) => @onEditorChange e
@@ -116,8 +147,6 @@ class @com.ee.ProblemsView
     $("#errorBox")
       .addClass("invisible")
     null
-
-  
   
   onRunButtonClick: (e) ->
     console.log "onRunButtonClick"
@@ -134,9 +163,6 @@ class @com.ee.ProblemsView
     @moveToProblem newId
     @updatePrevNextButtons()
     null
-
-
-  
 
   markTestSuccessful: ->
     $("#_problem_#{@problemId}")
@@ -170,7 +196,6 @@ class @com.ee.ProblemsView
   
 
   updateEditor: ->
-
     problem = @_getProblemForProblemId @problemId
     code = problem.code
 
@@ -181,8 +206,6 @@ class @com.ee.ProblemsView
       @editor.getSession().setValue @existingSolutions[@problemId]
     else
       @editor.getSession().setValue code 
-
-    
     null
 
   initPreviousNextButtons: ->

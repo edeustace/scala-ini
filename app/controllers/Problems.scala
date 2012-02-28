@@ -26,6 +26,9 @@ case class ResponseWithResults(successful:Boolean, result : EvaluationResult)
 
 object Problems extends Controller with Secured {
   
+  
+  val Json = ("Content-Type" -> "application/json; charset=utf-8")
+  
   val SUCCESS = "success"
   val MESSAGE = "message"
   val INVALID_SOLUTION_SYNTAX = "Error: you need to add " + PuzzleRegex.BEGIN + " and " + PuzzleRegex.END
@@ -113,8 +116,10 @@ object Problems extends Controller with Secured {
         if( evaluationResponse.successful ){
           storeSolutionIfLoggedIn( solution )
         }
-
-        Ok( generate( ResponseWithResults(evaluationResponse.successful, evaluationResponse) ))
+        val output = ResponseWithResults(evaluationResponse.successful, evaluationResponse)
+        val generated = generate(output)
+        
+        Ok( generate(output) ).withHeaders(Json)
       }
     }
   }
@@ -135,38 +140,45 @@ object Problems extends Controller with Secured {
    
   def solveAndSubmit() = Action { implicit request =>
 
-    getFormParameter( Params.SOLUTION )  match {
-      case None => Ok( generate( ResponseWithMessage(false, "No solution provided")))
-      case Some(solution) => {
+    def getResponse() = {
+      getFormParameter( Params.SOLUTION )  match {
+        
+        case None => ResponseWithMessage(false, "No solution provided")
+        
+        case Some(solution) => {
+        
+          getFormParameter( Params.SOLUTION )  match {
+            case None => ResponseWithMessage(false, "No solution provided")
+            case Some(solution) => {
+              val result : EvaluationResult = PuzzleEvaluator.solve(solution)
+                
+              if( result.successful ){
+                solution match {
+                  case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
 
-        val result : EvaluationResult = PuzzleEvaluator.solve(solution)
-
-        if( result.successful )
-        {
-          solution match 
-          {
-            case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
-
-              getFormParameters( Params.NAME, Params.DESCRIPTION, Params.LEVEL, Params.CATEGORY) match {
-             
-                case List(Some(name), Some(description), Some(level), Some(category)) => {
-                  
-                  //TODO: fix puzzle insertion
-                  //insertNewPuzzle(solution,name,description,level,category) 
-                  Ok( generate( ResponseWithMessage(true,SUBMITTED)) )
+                    getFormParameters( Params.NAME, Params.DESCRIPTION, Params.LEVEL, Params.CATEGORY) match {
+                   
+                      case List(Some(name), Some(description), Some(level), Some(category)) => {
+                        
+                        //TODO: fix puzzle insertion
+                        //insertNewPuzzle(solution,name,description,level,category) 
+                        ResponseWithMessage(true,SUBMITTED)
+                      }
+                      case _ => ResponseWithMessage(false, MISSING_ALL_FORM_VARS)
+                    }
+                  }
+                  case _ => ResponseWithMessage(false, INVALID_SOLUTION_SYNTAX)
                 }
-                case _ => Ok( generate( ResponseWithMessage(false, MISSING_ALL_FORM_VARS)) )
+
+              }else{
+                ResponseWithMessage(false, UNKNOWN_ERROR)
               }
             }
-            case _ => Ok( generate( ResponseWithMessage(false, INVALID_SOLUTION_SYNTAX)) )
           }
-
-        }else{
-          Ok( generate( ResponseWithMessage(false, UNKNOWN_ERROR)) )
         }
-
       }
-    } 
+    }
+    Ok( generate(getResponse()) ).withHeaders(Json)
   }
 
   private def insertNewPuzzle(solution:String, name:String, description:String, level : String, category:String )(implicit request : Request[AnyContent] )  = {

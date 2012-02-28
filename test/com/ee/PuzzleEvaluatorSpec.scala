@@ -78,6 +78,24 @@ class PuzzleEvaluatorSpec extends Specification {
         val firstSuccess = result.evaluations.filter(_.successful).head
         firstSuccess.line must equalTo(4)
     }
-  }
+    /*
+    "evaluate correctly when the solution contains ==" in {
+
+
+
+        isZero(1) == false 
+        isZero(0) == true"""
+
+      val clean = TagRegex.replaceAllIn(str,"")
+      println("clean")
+      println(clean)
+      val solutionRegex = WholeTagRegex.replaceAllIn(str, "(.*?)" )
+      println("solutinRegex") 
+      println(solutionRegex) 
+      val result = PuzzleEvaluator.solve(clean)
+      result.summary must equalTo(resultMessage(2))
+    }
+  }*/
+}
    
 }

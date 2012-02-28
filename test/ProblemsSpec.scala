@@ -34,9 +34,11 @@ class ProblemsSpec extends Specification {
       
         val result : Action[AnyContent] = controllers.Problems.jsonTest()
         
-        val actualResult = result.apply(FakeRequest())
+        val actualResult : play.api.mvc.Result = result.apply(FakeRequest())
         status(actualResult) must equalTo(OK)
-        contentAsString(actualResult) must equalTo("{\"name\":\"blah\"}")
+        println(">>> actualResult.body")
+        println(actualResult.toString)
+        //contentAs(actualResult) must equalTo("{\"name\":\"blah\"}")
       }
     }
   
@@ -65,7 +67,8 @@ class ProblemsSpec extends Specification {
         val result : Action[AnyContent] = controllers.Problems.solve()
         val request = FakeRequest().withFormUrlEncodedBody( ("solution", solution))
         val actualResult = result.apply(request)
-
+        println(">>> actualResult.body")
+        println(actualResult.toString)
         contentAsString(actualResult) must contain( PuzzleEvaluator.getSummary(2,0))
         status(actualResult) must equalTo(OK)
       }
