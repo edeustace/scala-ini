@@ -185,6 +185,99 @@ resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 
+  insert into problem (id,name,description,body,level,category,user_email)
+  values (10,'Pattern matching', 'Simple pattern matching', 
+    'def numberAsWord(i:Int) : String = i match {
+  case 1 => "one"
+  case 2 => "two"
+  case _ => "some other number"
+}
+
+
+numberAsWord(1) == /*<*/"one"/*>*/
+numberAsWord(2) == /*<*/"two"/*>*/
+numberAsWord(200) == /*<*/"some other number"/*>*/
+
+def wordAsNumber(s:String) : Int = s match {
+/*<*/
+  case "one" => 1
+  case "two" => 2
+  case _ => -1
+/*>*/
+}
+
+wordAsNumber("one") == 1
+wordAsNumber("two") == 2
+wordAsNumber("blah") == -1 
+    ', 'simple', 'functions', 'ed.eustace@gmail.com');
+
+
+   insert into problem (id,name,description,body,level,category,user_email)
+  values (11,'Palindrome detector', 'Write a function that finds palindromes', 
+    '/*Inspired by: http://www.4clojure.com/problem/27 */
+    /*Warning: For now, dont use two equals eg: [= =] in the method body. use equals() instead*/
+def isPalindrome( l : List[Any] ) : Boolean = l match {
+    /*<*/
+    case List() => true
+    case List(one) => true
+    case List(one,two) => one.equals(two)
+    case _ => l.head.equals(l.last) && isPalindrome(l.tail.init)
+    /*>*/
+}
+
+
+isPalindrome( List(1,2,1) ) == true
+isPalindrome( List(1,2,3) ) == false
+isPalindrome( List(1,2,2,1) ) == true
+isPalindrome( List("a", "b", "b", "a")) == true
+isPalindrome( List("c", "a", "r")) == false
+    ', 'simple', 'functions', 'ed.eustace@gmail.com');
+
+   insert into problem (id,name,description,body,level,category,user_email)
+  values (12,'Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
+    '/* inspired by: http://www.4clojure.com/problem/41 */
+    /*Warning: For now, dont use two equals eg: [= =] in the method body. use equals() instead*/
+
+def dropEveryNth( l : List[Any], n : Int ) : List[Any] = {
+  /*<*/
+  n match {
+    case 0 => List()
+    case 1 => l
+    case _ => {
+      
+      l match {
+        case List() => List()
+        case _ => l.take(n -1) ::: dropEveryNth(l.drop(n ), n)
+      }
+    }
+  }
+  /*>*/
+}
+
+def keepEveryNth( l : List[Any], n : Int ) : List[Any] = {
+  /*<*/
+  n match {
+    case 0 => List()
+    case 1 => l
+    case _ => {
+      
+      l match {
+        case List() => List()
+        case _ if l.length < n => List()
+        case _ => List(l.drop(n -1).head ) ::: keepEveryNth(l.drop(n -1).tail, n)
+      }
+    }
+  }
+   /*>*/
+}
+dropEveryNth( List(1,2,3,4,5), 2) == List(1,3,5)
+keepEveryNth( List(1,2,3,4,5), 2) == List(2,4)
+
+dropEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(1,2,4,5,7,8)
+keepEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(3,6)
+', 'simple', 'functions', 'ed.eustace@gmail.com');
+
+
 
 
 insert into problem (id,name,description,body,level,category,user_email)
