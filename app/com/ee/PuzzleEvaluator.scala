@@ -6,11 +6,56 @@ import play.api._
 case class EvaluationResult(successful:Boolean, summary:String, evaluations : List[SingleEvaluationResult] = List()  )
 case class SingleEvaluationResult(successful:Boolean = true, line:Int = -1, message : String = "")
 
+object PreparedPuzzleString
+{
+
+  object TAGS {
+    val INDEX = "{index}"
+    val BOOLEAN = "{boolean}"
+    val LINES = "{lines}"
+  }
+
+  val SINGLE_EVAL = "out = out ::: List(({index}, {boolean}))"
+  val TEMPLATE = """//declare the list
+var out : List[Tuple2[Int,Boolean]] = List()
+{lines}
+out"""
+}
+
+class PreparedPuzzleString
+{
+  def apply(s:String) : String = s match {
+    case s if s == null || s.isEmpty => s
+    case _ => {
+      val lines = s.split("\\n").toList 
+      
+
+      def isEvaluable(l:String) : Boolean = {
+        val out = l.contains("==") || l.trim.equals("true") || l.trim.equals("false")
+        out
+      }
+      def buildTuple(line:String, index:Int) : String = {
+        
+        val out : String = PreparedPuzzleString.SINGLE_EVAL
+          .replace( PreparedPuzzleString.TAGS.INDEX, index.toString)
+          .replace(PreparedPuzzleString.TAGS.BOOLEAN, line )
+        out
+      }
+      
+      val prepared = for{ 
+        (l,i) <- lines.zipWithIndex
+        out = if(isEvaluable(l)) buildTuple(l,i) else l
+      } yield out
+      val preparedLines = prepared.filter(!_.isEmpty).reduceLeft(_ + "\n" + _)
+
+      val out = PreparedPuzzleString.TEMPLATE.replace("{lines}", preparedLines)
+      out
+    }
+  }
+}
+
 object PuzzleEvaluator
 {
-  
-  val EVALUATE_TAG = "/*!evaluate!*/"
-
   object Error{
     val EMPTY_STRING = "empty string"
     val NULL_STRING = "null string"
@@ -24,8 +69,10 @@ object PuzzleEvaluator
     val FAILED = "Evaluation failed"
   }
   
-  val MESSAGE = "message"
-
+  def rawEval( value : String ) : List[Tuple2[Int,Boolean]] = {
+      (new Eval).apply[List[Tuple2[Int,Boolean]]](value)
+  }
+  
   def solve( solution : String ) : EvaluationResult = {
   
     def getCompilationException(s:String ) : Option[Exception] = {
@@ -46,8 +93,10 @@ object PuzzleEvaluator
 
           case Some(exception) => EvaluationResult(false, CompilationException )
           case None => {
-            val toEvaluate: List[DecomposedString] = decomposeSolution(s)
-            val evaluations : List[SingleEvaluationResult] = toEvaluate.map( applyEvaluation )
+            
+            val prepared : String = (new PreparedPuzzleString)(s)
+            val result : List[Tuple2[Int,Boolean]] = rawEval(prepared)
+            val evaluations = result.map((t:Tuple2[Int,Boolean]) => SingleEvaluationResult(t._2, t._1))
             val successful = evaluations.filter(_.successful).length
             val failed = evaluations.length - successful 
             EvaluationResult(successful == evaluations.length, getSummary(successful,failed),evaluations)
@@ -63,33 +112,5 @@ object PuzzleEvaluator
       .replace("{successful}", successful.toString )
       .replace("{failed}", failed.toString )
 
-  }
-  
-  private def decomposeSolution( solution : String ) : List[DecomposedString] = {
-   
-    def toMultiline( l : List[String]) : String = l.reduceLeft(_ + "\n" + _) 
-    val EQUALITY_CHECK = "=="
-    val lines = solution.split("\n").toList 
-
-
-    def isSingleEvaluation( s:String) : Boolean = {
-      val equalsIndex = s.split("\n").indexWhere( _.contains(EQUALITY_CHECK)) 
-      equalsIndex == lines.length || equalsIndex == -1
-    }
-
-    solution match {
-      case s : String if isSingleEvaluation(s) => List(DecomposedString(s,s.length))
-      case _ => LineHarvester.harvestLines(lines, EQUALITY_CHECK)    
-    }
-  }
-
-  private def applyEvaluation( decomposedString : DecomposedString ) : SingleEvaluationResult = {
-    Logger.debug("applyEvaluation")
-    Logger.debug(decomposedString.value)
-      val result = (new Eval).apply[Boolean](decomposedString.value)
-      result match {
-        case true => SingleEvaluationResult(true, decomposedString.line)  
-        case false => SingleEvaluationResult(false, decomposedString.line) 
-      }
   }
 }

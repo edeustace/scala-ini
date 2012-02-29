@@ -38,7 +38,6 @@ class PuzzleEvaluatorSpec extends Specification {
         val result = PuzzleEvaluator.solve("""false""")
         result.summary must equalTo(resultMessage(0,1))
     }
-
     "pass on a simple single evaluation" in {
         val result = PuzzleEvaluator.solve("""def plusTwo(x:Int) : Int = {
           x + 2
@@ -78,6 +77,83 @@ class PuzzleEvaluatorSpec extends Specification {
         val firstSuccess = result.evaluations.filter(_.successful).head
         firstSuccess.line must equalTo(4)
     }
+
+
+  "PreparedPuzzleString" should {
+    "prepare it correctly" in {
+      val s = "x == y"
+
+      val eval = PreparedPuzzleString.SINGLE_EVAL
+        .replace(PreparedPuzzleString.TAGS.INDEX, "0")
+        .replace(PreparedPuzzleString.TAGS.BOOLEAN, "x == y")
+      
+      val expected = PreparedPuzzleString.TEMPLATE
+        .replace(PreparedPuzzleString.TAGS.LINES, eval)
+
+      println("expected: ")
+      println(expected)
+      (new PreparedPuzzleString)(s) must equalTo( expected )
+    }
+
+
+    "work with multiline" in {
+        val s = """def addOne(x:Int) : Int = x + 1
+addOne(1) == 2
+addOne(2) == 3"""
+
+        val expected = """//declare the list
+var out : List[Tuple2[Int,Boolean]] = List()
+def addOne(x:Int) : Int = x + 1
+out = out ::: List((1, addOne(1) == 2))
+out = out ::: List((2, addOne(2) == 3))
+out"""
+
+    (new PreparedPuzzleString)(s) must equalTo(expected)
+    
+    }
+  }
+
+
+  "work for a real example" in {
+    val s = """"hello world" .toUpperCase == "HELLO WORLD"
+
+"HELLO WORLD" .toLowerCase == "hello world"
+
+// fill in this method so that a string of words gets capitalized
+def capitalize(s: String) = {
+
+  def capitalizeWord( w : String ) = w(0).toUpper + w.substring(1, w.length).toLowerCase
+  val wordList = s.split("\\s").toList.map( capitalizeWord )
+  wordList.reduceLeft(_ + " " + _)
+
+}
+
+capitalize("man OF stEEL") == "Man Of Steel" """
+
+  val expected = """//declare the list
+var out : List[Tuple2[Int,Boolean]] = List()
+out = out ::: List((0, "hello world" .toUpperCase == "HELLO WORLD"))
+out = out ::: List((2, "HELLO WORLD" .toLowerCase == "hello world"))
+// fill in this method so that a string of words gets capitalized
+def capitalize(s: String) = {
+  def capitalizeWord( w : String ) = w(0).toUpper + w.substring(1, w.length).toLowerCase
+  val wordList = s.split("\\s").toList.map( capitalizeWord )
+  wordList.reduceLeft(_ + " " + _)
+}
+out = out ::: List((13, capitalize("man OF stEEL") == "Man Of Steel" ))
+out"""
+
+    val prepared = (new PreparedPuzzleString)(s)
+
+    prepared must equalTo(expected)
+    
+    val response : List[Tuple2[Int,Boolean]] = PuzzleEvaluator.rawEval(prepared)
+    
+    println( response )
+    response.length must equalTo(3)
+
+  }
+
     /*
     "evaluate correctly when the solution contains ==" in {
 
