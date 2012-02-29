@@ -78,32 +78,6 @@ class PuzzleEvaluatorSpec extends Specification {
         firstSuccess.line must equalTo(4)
     }
 
-    "is quick when not prechecking" in {
-
-        val testString = """def plusTwo(x:Int) : Int = {
-          x + 2
-        }
-
-        plusTwo(1) == 3
-        plusTwo(3) == 5
-        plusTwo(5) == 5
-        plusTwo(6) == 8
-        plusTwo(7) == 9"""
-
-        val now = new java.util.Date()
-        val result = PuzzleEvaluator.solve(testString)
-        val diff = new java.util.Date().getTime - now.getTime
-
-        val now2 = new java.util.Date()
-        PuzzleEvaluator.solve(testString, true)
-        val diff2 = new java.util.Date().getTime - now2.getTime
-
-        println( "speed diff >> " + diff + " with compile error check: " + diff2)
-        (diff < diff2) must equalTo(true)
-
-
-    }
-
 
   "PreparedPuzzleString" should {
     "prepare it correctly" in {

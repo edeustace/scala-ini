@@ -73,7 +73,7 @@ object PuzzleEvaluator
       (new Eval).apply[List[Tuple2[Int,Boolean]]](value)
   }
   
-  def solve( solution : String, preCheckForExceptions : Boolean = false ) : EvaluationResult = {
+  def solve( solution : String ) : EvaluationResult = {
   
     def getCompilationException(s:String ) : Option[Exception] = {
       try{
@@ -84,36 +84,25 @@ object PuzzleEvaluator
       None
     } 
     
-    if( preCheckForExceptions ){
-        getCompilationException(solution) match{
+    solution match {
+      case null => EvaluationResult(false, Error.NULL_STRING)
+      case s : String if s.isEmpty => EvaluationResult(false, Error.EMPTY_STRING)
+      case s : String if !s.isEmpty => {
 
-          case Some(exception) => EvaluationResult(false, CompilationException )
-          case None => {
-            _prepareSolutionAndEval(solution)        
-          }
+        try {
+          _prepareSolutionAndEval(solution)    
         }
-    }
-    else {
-    
-      solution match {
-        case null => EvaluationResult(false, Error.NULL_STRING)
-        case s : String if s.isEmpty => EvaluationResult(false, Error.EMPTY_STRING)
-        case s : String if !s.isEmpty => {
-
-          try {
-            _prepareSolutionAndEval(solution)    
-          }
-          catch {
-            case ex : Exception => {
-              getCompilationException(solution) match {
-                case Some(exception) => EvaluationResult(false, CompilationException)
-                case None => EvaluationResult(false, "Compilation Exception in the derived code")
-              } 
-            }
+        catch {
+          case ex : Exception => {
+            getCompilationException(solution) match {
+              case Some(exception) => EvaluationResult(false, CompilationException)
+              case None => EvaluationResult(false, "Compilation Exception in the derived code")
+            } 
           }
         }
       }
     }
+    
   }
 
   private def _prepareSolutionAndEval(s:String) : EvaluationResult = {
