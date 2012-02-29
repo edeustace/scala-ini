@@ -73,7 +73,7 @@ object PuzzleEvaluator
       (new Eval).apply[List[Tuple2[Int,Boolean]]](value)
   }
   
-  def solve( solution : String ) : EvaluationResult = {
+  def solve( solution : String, preCheckForExceptions : Boolean = false ) : EvaluationResult = {
   
     def getCompilationException(s:String ) : Option[Exception] = {
       try{
@@ -83,27 +83,46 @@ object PuzzleEvaluator
       }
       None
     } 
-
-    solution match {
-      case null => EvaluationResult(false, Error.NULL_STRING)
-      case s : String if s.isEmpty => EvaluationResult(false, Error.EMPTY_STRING)
-      case s : String if !s.isEmpty => {
-
+    
+    if( preCheckForExceptions ){
         getCompilationException(solution) match{
 
           case Some(exception) => EvaluationResult(false, CompilationException )
           case None => {
-            
-            val prepared : String = (new PreparedPuzzleString)(s)
-            val result : List[Tuple2[Int,Boolean]] = rawEval(prepared)
-            val evaluations = result.map((t:Tuple2[Int,Boolean]) => SingleEvaluationResult(t._2, t._1))
-            val successful = evaluations.filter(_.successful).length
-            val failed = evaluations.length - successful 
-            EvaluationResult(successful == evaluations.length, getSummary(successful,failed),evaluations)
+            _prepareSolutionAndEval(solution)        
+          }
+        }
+    }
+    else {
+    
+      solution match {
+        case null => EvaluationResult(false, Error.NULL_STRING)
+        case s : String if s.isEmpty => EvaluationResult(false, Error.EMPTY_STRING)
+        case s : String if !s.isEmpty => {
+
+          try {
+            _prepareSolutionAndEval(solution)    
+          }
+          catch {
+            case ex : Exception => {
+              getCompilationException(solution) match {
+                case Some(exception) => EvaluationResult(false, CompilationException)
+                case None => EvaluationResult(false, "Compilation Exception in the derived code")
+              } 
+            }
           }
         }
       }
     }
+  }
+
+  private def _prepareSolutionAndEval(s:String) : EvaluationResult = {
+    val prepared : String = (new PreparedPuzzleString)(s)
+    val result : List[Tuple2[Int,Boolean]] = rawEval(prepared)
+    val evaluations = result.map((t:Tuple2[Int,Boolean]) => SingleEvaluationResult(t._2, t._1))
+    val successful = evaluations.filter(_.successful).length
+    val failed = evaluations.length - successful 
+    EvaluationResult(successful == evaluations.length, getSummary(successful,failed),evaluations)
   }
 
   def getSummary(successful:Int, failed : Int) : String = {
