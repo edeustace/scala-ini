@@ -1,8 +1,10 @@
 @(form: Form[(String,String)])(implicit flash: Flash)
 @base("Login") {
-       <div class="column left-400 max-width"> 
+<div class="column left-400 max-width"> 
+
   <div class="rounded-white">
-        @helper.form(routes.Application.authenticate) {
+      @common.inDevelopmentWarning()
+      @helper.form(routes.Application.authenticate) {
             
             @form.globalError.map { error =>
                 <p class="error">
