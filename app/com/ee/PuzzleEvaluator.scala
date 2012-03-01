@@ -75,9 +75,9 @@ object PuzzleEvaluator
   
   def solve( solution : String ) : EvaluationResult = {
   
-    def getCompilationException(s:String ) : Option[Exception] = {
+    def getCompilationException(code:String ) : Option[Exception] = {
       try{
-        (new Eval).apply[Boolean](s)
+        (new Eval).apply[Boolean](code)
       }catch{
         case ex: Exception => return Option(ex) 
       }
@@ -95,7 +95,11 @@ object PuzzleEvaluator
         catch {
           case ex : Exception => {
             getCompilationException(solution) match {
-              case Some(exception) => EvaluationResult(false, CompilationException)
+
+              case Some(exception) => { 
+                println("exception for solution: " + solution)
+                EvaluationResult(false, CompilationException + ": " + exception.getMessage)
+              }
               case None => EvaluationResult(false, "Compilation Exception in the derived code")
             } 
           }

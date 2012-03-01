@@ -19,10 +19,23 @@ class PuzzleEvaluatorSpec extends Specification {
   "PuzzleEvaluator" should {
 
     "return a compilation exception" in {
-      val result = PuzzleEvaluator.solve("asdfads d= 238.0230.32498 afsdf adsasdf")
-      result.summary must equalTo( PuzzleEvaluator.CompilationException)
+      val result = PuzzleEvaluator.solve("asdfads")
+      val containsSpecificError = result.summary.contains("not found: value asdfads")
+      val containsGeneralError = result.summary.contains(PuzzleEvaluator.CompilationException)
+      containsSpecificError must equalTo(true)
+      containsGeneralError must equalTo(true)
     }
 
+
+    "return a compilation exception" in {
+      val result = PuzzleEvaluator.solve("""//booleans
+true == ?asdf
+false == ?""")
+      println("result.summary")
+      println(result.summary)
+      val containsSpecificError = result.summary.contains("not found: value ?asdf")
+      containsSpecificError must equalTo(true)
+    }
 
     "return a null or empty string error" in {
       val result = PuzzleEvaluator.solve(null)
