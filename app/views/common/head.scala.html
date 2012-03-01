@@ -7,3 +7,19 @@
 <script src="/assets/javascripts/ace/theme-twilight-noconflict.js" type="text/javascript" charset="utf-8"></script>
 <script src="/assets/javascripts/ace/mode-scala-noconflict.js" type="text/javascript" charset="utf-8"></script>
 @common.googleAnalytics()
+
+<script type="text/javascript" charset="utf-8">
+
+  $(document).ready(function(){
+
+      console.log("href: " + document.location.pathname  )
+
+    if( document.location.hasOwnProperty("pathname") && document.location.pathname == "/" )
+    {
+      $('#helpModal').modal({
+         backdrop: false
+      });
+    }
+
+  });
+</script>
