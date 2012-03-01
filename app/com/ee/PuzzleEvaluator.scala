@@ -15,11 +15,11 @@ object PreparedPuzzleString
     val LINES = "{lines}"
   }
 
-  val SINGLE_EVAL = "out = out ::: List(({index}, {boolean}))"
+  val SINGLE_EVAL = "__evalOut__ = __evalOut__ ::: List(({index}, {boolean}))"
   val TEMPLATE = """//declare the list
-var out : List[Tuple2[Int,Boolean]] = List()
+var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
 {lines}
-out"""
+__evalOut__"""
 }
 
 class PreparedPuzzleString
@@ -95,11 +95,7 @@ object PuzzleEvaluator
         catch {
           case ex : Exception => {
             getCompilationException(solution) match {
-
-              case Some(exception) => { 
-                println("exception for solution: " + solution)
-                EvaluationResult(false, CompilationException + ": " + exception.getMessage)
-              }
+              case Some(exception) => EvaluationResult(false, CompilationException + ": " + exception.getMessage)
               case None => EvaluationResult(false, "Compilation Exception in the derived code")
             } 
           }
