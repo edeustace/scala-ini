@@ -33,7 +33,7 @@ true == ?asdf
 false == ?""")
       println("result.summary")
       println(result.summary)
-      val containsSpecificError = result.summary.contains("not found: value ?asdf")
+      val containsSpecificError = result.summary.contains("not found: value ?")
       containsSpecificError must equalTo(true)
     }
 
@@ -115,11 +115,11 @@ addOne(1) == 2
 addOne(2) == 3"""
 
         val expected = """//declare the list
-var out : List[Tuple2[Int,Boolean]] = List()
+var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
 def addOne(x:Int) : Int = x + 1
-out = out ::: List((1, addOne(1) == 2))
-out = out ::: List((2, addOne(2) == 3))
-out"""
+__evalOut__ = __evalOut__ ::: List((1, addOne(1) == 2))
+__evalOut__ = __evalOut__ ::: List((2, addOne(2) == 3))
+__evalOut__"""
 
     (new PreparedPuzzleString)(s) must equalTo(expected)
     
@@ -144,17 +144,17 @@ def capitalize(s: String) = {
 capitalize("man OF stEEL") == "Man Of Steel" """
 
   val expected = """//declare the list
-var out : List[Tuple2[Int,Boolean]] = List()
-out = out ::: List((0, "hello world" .toUpperCase == "HELLO WORLD"))
-out = out ::: List((2, "HELLO WORLD" .toLowerCase == "hello world"))
+var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
+__evalOut__ = __evalOut__ ::: List((0, "hello world" .toUpperCase == "HELLO WORLD"))
+__evalOut__ = __evalOut__ ::: List((2, "HELLO WORLD" .toLowerCase == "hello world"))
 // fill in this method so that a string of words gets capitalized
 def capitalize(s: String) = {
   def capitalizeWord( w : String ) = w(0).toUpper + w.substring(1, w.length).toLowerCase
   val wordList = s.split("\\s").toList.map( capitalizeWord )
   wordList.reduceLeft(_ + " " + _)
 }
-out = out ::: List((13, capitalize("man OF stEEL") == "Man Of Steel" ))
-out"""
+__evalOut__ = __evalOut__ ::: List((13, capitalize("man OF stEEL") == "Man Of Steel" ))
+__evalOut__"""
 
     val prepared = (new PreparedPuzzleString)(s)
 
