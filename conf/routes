@@ -21,6 +21,8 @@ GET     /problems/authenticate      controllers.Problems.testAuthentication()
 GET     /problems/:id               controllers.Problems.show(id)
 POST    /problems/solve             controllers.Problems.solve()
 
+GET     /not_supported              controllers.Application.notSupported()
+
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
 

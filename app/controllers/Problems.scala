@@ -1,25 +1,22 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
-import models._
-import models.Problem
-import scala.tools.nsc._
-import com.twitter.util.Eval
-import com.ee._
-import play.api.http.ContentTypes
-import play.api.libs.json._
-import play.api.libs.json.Json._
-import play.api._
-import play.api.mvc._
 import scala.util.matching.Regex
-import org.codehaus.jackson.{ JsonGenerator, JsonToken, JsonParser }
-import org.codehaus.jackson.`type`.JavaType
-import org.codehaus.jackson.map._
-import org.codehaus.jackson.map.annotate.JsonCachable
-import org.codehaus.jackson.map.`type`.{ TypeFactory, ArrayType }
-import org.codehaus.jackson.map.annotate.JsonCachable
-import com.codahale.jerkson.Json._
+
+import com.codahale.jerkson.Json.generate
+import com.ee.EvaluationResult
+import com.ee.PuzzleEvaluator
+
+import controllers.Application.BrowserRestrict
+import controllers.Secured
+import models.NewProblem
+import models.Problem
+import models.User
+import models.UserSolution
+import play.api.mvc.Request
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.Controller
+import play.api.Logger
 
 case class ResponseWithMessage(successful:Boolean, message : String)
 case class ResponseWithResults(successful:Boolean, result : EvaluationResult)
@@ -54,11 +51,7 @@ object Problems extends Controller with Secured {
     val CATEGORY = "category"
   }
 
-  case class Blah(name:String)
- 
-  def jsonTest() = Action { implicit request => 
-    Ok( generate(Blah("blah")))
-  }
+  
   
   def submitPuzzlePage = IsAuthenticated { username => _ =>
     User.findByEmail(username).map{ user => 
@@ -82,19 +75,21 @@ object Problems extends Controller with Secured {
    * @param orderBy Column to be sorted
    * @param filter Filter applied on computer names
    */
-  def index(page: Int = 0, orderBy: Int = 1, filter: String = "") = Action { implicit request =>
+  def index(page: Int = 0, orderBy: Int = 1, filter: String = "") = BrowserRestrict {
+    Action { implicit request =>
 
-    val user : User = getUser(request)
-    var solutions : Seq[UserSolution] = List()
-    Logger.debug("Problems.index :: user: " + user)
-    if( user != null ){
-      solutions = UserSolution.findSolutionsByEmail(user.email)  
+      val user : User = getUser(request)
+      var solutions : Seq[UserSolution] = List()
+      Logger.debug("Problems.index :: user: " + user)
+      if( user != null ){
+        solutions = UserSolution.findSolutionsByEmail(user.email)  
+      }
+      
+      Ok(views.html.problems.list(
+        "Scala Puzzles",
+        Problem.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")),orderBy, filter, user, solutions )
+      )
     }
-    
-    Ok(views.html.problems.list(
-      "Scala Puzzles",
-      Problem.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")),orderBy, filter, user, solutions )
-    )
   }
 
 
@@ -195,7 +190,7 @@ object Problems extends Controller with Secured {
   //TODO: Tidy this up
   private def getFormParameters( names : String* )( implicit request : Request[AnyContent]) : List[Option[String]] = {
 	  
-      val l = List.fromArray(names.toArray[String])
+      val l = names.toArray[String].toList
       l match {
       case List() => List()
       case _ => List(getFormParameter(l.head)) ::: getFormParameters(l.tail.toArray[String] : _*)

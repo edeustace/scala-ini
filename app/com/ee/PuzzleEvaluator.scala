@@ -1,4 +1,4 @@
-package com.ee 
+package com.ee
 
 import com.twitter.util.Eval
 import play.api._

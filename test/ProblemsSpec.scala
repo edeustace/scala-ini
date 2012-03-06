@@ -2,11 +2,11 @@ package test
 
 import org.specs2.mutable._
 import play.api.test._
-import com.ee._
 import play.api.test.Helpers._
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.Logger
+import _root_.com.ee.PuzzleEvaluator
 
 
 class ProblemsSpec extends Specification {
@@ -26,23 +26,6 @@ class ProblemsSpec extends Specification {
   
   "Application" should {
     
-   
-  
-  "generate json" in {
-
-      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
-      
-        val result : Action[AnyContent] = controllers.Problems.jsonTest()
-        
-        val actualResult : play.api.mvc.Result = result.apply(FakeRequest())
-        status(actualResult) must equalTo(OK)
-        println(">>> actualResult.body")
-        println(actualResult.toString)
-        //contentAs(actualResult) must equalTo("{\"name\":\"blah\"}")
-      }
-    }
-  
-  
     "show the problem list on  /" in {
 
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {

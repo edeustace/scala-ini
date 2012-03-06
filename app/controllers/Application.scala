@@ -1,15 +1,45 @@
 package controllers
 
-import play.api._
-import play.api.mvc._
-import play.api.data._
-import play.api.data.Forms._
+import com.codahale.jerkson.Json._
+import com.ee._
+import com.ee.BrowserCheck
 
 import models._
+import models._
+import models.Problem
+import play.api.data.Forms._
+import play.api.data._
+import play.api.libs.json.Json._
+import play.api.mvc._
+import play.api.mvc._
+import play.api.mvc._
+import play.api._
+import play.api._
+import play.api._
 import views._
+
+
+
 
 object Application extends Controller {
 
+  case class BrowserRestrict[A](action: Action[A]) extends Action[A] {
+  
+	  def apply(request: Request[A]): Result = {
+	    val Some(userAgent) = request.headers.get("USER-AGENT")
+	    
+	    if( BrowserCheck.isPermitted( userAgent )){
+	      action(request)
+	    }
+	    else{
+	      Redirect("/not_supported")
+	    }
+	
+	
+	  }
+	  
+	  lazy val parser = action.parser	
+}
   // -- Authentication
 
   val loginForm = Form(
@@ -34,12 +64,16 @@ object Application extends Controller {
   /**
    * Login page.
    */
-  def login = Action { implicit request =>
-    Ok(html.login(loginForm))
+  def login = BrowserRestrict {
+    Action { implicit request =>
+    	Ok(html.login(loginForm))
+    }
   }
 
-  def signup = Action{ implicit request => 
-    Ok(html.signup(signUpForm))
+  def signup = BrowserRestrict{
+	  Action{ implicit request => 
+	  	Ok(html.signup(signUpForm))
+  	}
   }
 
   def completeSignup = Action{ implicit request => 
@@ -79,6 +113,9 @@ object Application extends Controller {
     ).as("text/javascript") 
   }
 
+  def notSupported = Action {
+    Ok(views.html.notSupported())
+  }
 }
 
 /**
