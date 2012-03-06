@@ -14,7 +14,7 @@
 
       console.log("href: " + document.location.pathname  )
 
-    if( document.location.hasOwnProperty("pathname") && document.location.pathname == "/" )
+    if( document.location["pathname"] == "/" )
     {
       $('#helpModal').modal({
          backdrop: false
