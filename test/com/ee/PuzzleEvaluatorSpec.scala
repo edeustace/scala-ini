@@ -6,17 +6,21 @@ import play.api.test.Helpers._
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.Logger
+import _root_.com.ee._
 
 
 class PuzzleEvaluatorSpec extends Specification {
   
-  import com.ee._
-  import controllers._
-
   
   def resultMessage(successful:Int = 0,failed:Int=0) : String = PuzzleEvaluator.getSummary(successful, failed)
   
   "PuzzleEvaluator" should {
+
+    "return an unsafe solution warning" in {
+      val result = PuzzleEvaluator.solve("System.exit(0)")
+      result.summary must equalTo(PuzzleEvaluator.Error.UNSAFE_SOLUTION)
+    }
+
 
     "return a compilation exception" in {
       val result = PuzzleEvaluator.solve("asdfads")

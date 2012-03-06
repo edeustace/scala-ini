@@ -25,21 +25,22 @@ object Application extends Controller {
 
   case class BrowserRestrict[A](action: Action[A]) extends Action[A] {
   
-	  def apply(request: Request[A]): Result = {
-	    val Some(userAgent) = request.headers.get("USER-AGENT")
-	    
-	    if( BrowserCheck.isPermitted( userAgent )){
-	      action(request)
-	    }
-	    else{
-	      Redirect("/not_supported")
-	    }
-	
-	
-	  }
-	  
-	  lazy val parser = action.parser	
-}
+    def apply(request: Request[A]): Result = {
+      request.headers.get("USER-AGENT") match {
+        case Some(userAgent) => {
+          BrowserCheck.isPermitted( userAgent ) match {
+            case true => action(request)
+            case false => Redirect("/not_supported")
+          }
+        }
+        case _ => action(request)
+      }
+    }
+    
+    lazy val parser = action.parser	
+    
+  }
+  
   // -- Authentication
 
   val loginForm = Form(

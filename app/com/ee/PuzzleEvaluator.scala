@@ -46,8 +46,7 @@ class PreparedPuzzleString
         (l,i) <- lines.zipWithIndex
         out = if(isEvaluable(l)) buildTuple(l,i) else l
       } yield out
-      val preparedLines = prepared.filter(!_.isEmpty).reduceLeft(_ + "\n" + _)
-
+      val preparedLines = prepared.filter(!_.isEmpty).mkString("\n")
       val out = PreparedPuzzleString.TEMPLATE.replace("{lines}", preparedLines)
       out
     }
@@ -59,11 +58,20 @@ object PuzzleEvaluator
   object Error{
     val EMPTY_STRING = "empty string"
     val NULL_STRING = "null string"
+    val UNSAFE_SOLUTION = "Unsafe solution - does your solution contain any of the following: " + UnsafeStrings.mkString(", ") + "?"
   }
 
   val ResultSummary = "Evaluated {count}. successful: {successful} failed: {failed}"
 
   val CompilationException = "Could not compile"
+
+
+  val UnsafeStrings : List[String] = List("system", 
+      "exit",
+      "db",
+      "sql",
+      "throw",
+      "exception")
 
   object Failed {
     val FAILED = "Evaluation failed"
@@ -83,10 +91,11 @@ object PuzzleEvaluator
       }
       None
     } 
-    
+
     solution match {
       case null => EvaluationResult(false, Error.NULL_STRING)
       case s : String if s.isEmpty => EvaluationResult(false, Error.EMPTY_STRING)
+      case s : String if !s.isEmpty && !isSafe(s) => EvaluationResult(false, Error.UNSAFE_SOLUTION)
       case s : String if !s.isEmpty => {
 
         try {
@@ -103,6 +112,17 @@ object PuzzleEvaluator
       }
     }
     
+  }
+
+  def isSafe(solution:String) : Boolean = {
+    
+
+    for( unsafeString <- UnsafeStrings){
+      if( solution.toLowerCase.contains(unsafeString)){
+        return false
+      }
+    }
+    true
   }
 
   private def _prepareSolutionAndEval(s:String) : EvaluationResult = {
