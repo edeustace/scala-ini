@@ -11,7 +11,7 @@
 
     REGEX_CHARS = "*.|[]$()";
 
-    NORMAL = "a-z,A-Z,0-9,.,=,:,;,_,{,},',\",?,\\/,-,\\\\,\\+,>,\\-";
+    NORMAL = "a-z,A-Z,0-9,.,=,:,;,_,{,},',\",?,\\/,-,\\\\,<,>,\\-,&,\\+,^,%,~,#,`";
 
     SPECIAL = "\\s,\\n,\\t";
 
@@ -74,10 +74,7 @@
     StringUpdateProcessor.prototype.update = function(proposedString) {
       var s;
       s = proposedString;
-      if (this.pattern.test(s)) {
-        console.debug("legal!");
-        this.latest = s;
-      }
+      if (this.pattern.test(s)) this.latest = s;
       return this.latest;
     };
 

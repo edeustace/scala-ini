@@ -16,7 +16,11 @@ object PreparedPuzzleString
   }
 
   val SINGLE_EVAL = "__evalOut__ = __evalOut__ ::: List(({index}, {boolean}))"
-  val TEMPLATE = """//declare the list
+  val PREAMBLE = """//this is generated code
+//to allow for a batch evaluation
+//declare the list
+"""
+  val TEMPLATE = PREAMBLE + """
 var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
 {lines}
 __evalOut__"""
@@ -81,7 +85,9 @@ object PuzzleEvaluator
       (new Eval).apply[List[Tuple2[Int,Boolean]]](value)
   }
   
-  def solve( solution : String ) : EvaluationResult = {
+  def solve(  solution : String, 
+              prePrepare : Option[String => String] = None, 
+              postPrepare : Option[String => String] = None ) : EvaluationResult = {
   
     def getCompilationException(code:String ) : Option[Exception] = {
       try{
@@ -99,13 +105,16 @@ object PuzzleEvaluator
       case s : String if !s.isEmpty => {
 
         try {
-          _prepareSolutionAndEval(solution)    
+          _prepareSolutionAndEval(solution, prePrepare, postPrepare)    
         }
         catch {
           case ex : Exception => {
             getCompilationException(solution) match {
               case Some(exception) => EvaluationResult(false, CompilationException + ": " + exception.getMessage)
-              case None => EvaluationResult(false, "Compilation Exception in the derived code")
+              case None => {
+                Logger.error("Error in derived code")
+                EvaluationResult(false, "Compilation Exception in the derived code") 
+              }
             } 
           }
         }
@@ -115,8 +124,6 @@ object PuzzleEvaluator
   }
 
   def isSafe(solution:String) : Boolean = {
-    
-
     for( unsafeString <- UnsafeStrings){
       if( solution.toLowerCase.contains(unsafeString)){
         return false
@@ -125,9 +132,37 @@ object PuzzleEvaluator
     true
   }
 
-  private def _prepareSolutionAndEval(s:String) : EvaluationResult = {
-    val prepared : String = (new PreparedPuzzleString)(s)
-    val result : List[Tuple2[Int,Boolean]] = rawEval(prepared)
+
+  /**
+   * Prepare the solution string and eval it.
+   * Our eval technique is to:
+   * 1. search for any line that contains '=='
+   * 2. place those lines into a tuple that contains the original line number and the evaluation
+   * 3. Execute an eval the expects a List[Tuple2[Int,Boolean]] response.
+   *
+   * Note that there is some pre and post processing of the string being prepared.
+   * This is due to the user solution potentially containing '==' that should be ignored.
+   * TODO: This should be removed from here.
+   *
+   */
+  private def _prepareSolutionAndEval(s:String, prePrepare : Option[String => String], postPrepare : Option[String => String]) : EvaluationResult = {
+
+    val prePrepared : String = prePrepare match {
+      case Some(fn) => fn(s)
+      case _ => s
+    }
+    
+    Logger.debug(prePrepared)
+    val prepared : String = (new PreparedPuzzleString)(prePrepared)
+    
+    val postPrepared = postPrepare match {
+      case Some(fn) => fn(prepared)
+      case _ => prepared
+    }
+
+    Logger.debug(postPrepared)
+    
+    val result : List[Tuple2[Int,Boolean]] = rawEval(postPrepared)
     val evaluations = result.map((t:Tuple2[Int,Boolean]) => SingleEvaluationResult(t._2, t._1))
     val successful = evaluations.filter(_.successful).length
     val failed = evaluations.length - successful 

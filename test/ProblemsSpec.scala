@@ -9,7 +9,7 @@ import play.api.Logger
 import _root_.com.ee.PuzzleEvaluator
 
 
-class ProblemsSpec extends Specification {
+class ProblemsSpec extends Specification with Tags {
   
   import models._
   import controllers._
@@ -17,6 +17,7 @@ class ProblemsSpec extends Specification {
   val beginTag = Problems.PuzzleRegex.BEGIN 
   val endTag = Problems.PuzzleRegex.END
 
+  //args(include="1")
 
   // -- Date helpers
   
@@ -26,6 +27,7 @@ class ProblemsSpec extends Specification {
   
   "Application" should {
     
+
     "show the problem list on  /" in {
 
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
@@ -57,8 +59,8 @@ class ProblemsSpec extends Specification {
       }
     }
 
+    tag("1", "unit")
     "show that x does not equal to y" in{
-    
       running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
       
         val solution = """false"""

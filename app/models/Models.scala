@@ -77,26 +77,31 @@ object Problem {
     get[String]("problem.user_email") ~
     get[String]("user.name")  map {
       case id~name~description~body~level~category~user_email~user_name 
-        => Problem(id, name, description, ProblemMasker.mask(body), level, category, user_email, user_name)
+        => Problem(id, name, description, body, level, category, user_email, user_name)
     }
   }
  
+  
   
   // -- Queries
   
   /**
    * Retrieve a problem from the id.
    */
-  def findById(id: Long): Problem = {
+  def findById(id: Long, maskSolution:Boolean = true): Problem = {
     val opt : Option[Problem] = DB.withConnection { implicit connection =>
       SQL("""select * from problem as problem 
               inner JOIN user as user
               on user.email = problem.user_email
               where id = {id}""").on('id -> id).as(Problem.simple.singleOpt )
     }
-    opt.get
+    opt match {
+      case None => null
+      case Some(p) => if( maskSolution ) mask(p) else p
+    }
   }
 
+  private def mask(p : Problem ) : Problem = Problem(p.id, p.name, p.description, ProblemMasker.mask(p.body), p.level, p.category, p.user_email, p.user_name)
  
   /**
    * Return a page of (Problem,Company).
@@ -139,8 +144,8 @@ object Problem {
       ).on(
         'filter -> filter
       ).as(scalar[Long].single)
-
-      Page(problems, page, offset, totalRows)
+      val masked = problems.map( mask )
+      Page(masked, page, offset, totalRows)
       
     }
     

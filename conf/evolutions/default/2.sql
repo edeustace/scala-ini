@@ -42,9 +42,13 @@ insert into problem (id,name,description,body,level,category,user_email)
   values (3,'Functions','Some basic functions',
 '//def defines a function
 def addOne(m: Int): Int = m + 1
-
 addOne(1) == /*<*/2/*>*/
 addOne(2) == /*<*/3/*>*/
+
+def isOne(m:Int) : Boolean = /*<*/m == 1/*>*/
+
+isOne(1) == true
+isOne(0) == false
 
 // now you write the function...
 def addTwo(m:Int):Int = /*<*/m + 2/*>*/
@@ -215,7 +219,6 @@ wordAsNumber("blah") == -1
    insert into problem (id,name,description,body,level,category,user_email)
   values (11,'Palindrome detector', 'Write a function that finds palindromes', 
     '/*Inspired by: http://www.4clojure.com/problem/27 */
-    /*Warning: For now, dont use two equals eg: [= =] in the method body. use equals() instead*/
 def isPalindrome( l : List[Any] ) : Boolean = l match {
     /*<*/
     case List() => true
@@ -226,17 +229,19 @@ def isPalindrome( l : List[Any] ) : Boolean = l match {
 }
 
 
-isPalindrome( List(1,2,1) ) == true
-isPalindrome( List(1,2,3) ) == false
-isPalindrome( List(1,2,2,1) ) == true
-isPalindrome( List("a", "b", "b", "a")) == true
-isPalindrome( List("c", "a", "r")) == false
+isPalindrome(List(1) ) == true 
+isPalindrome(List(1,2) ) == false 
+isPalindrome(List(1,1) ) == true
+isPalindrome(List(1,2,1) ) == true
+isPalindrome(List(1,2,3) ) == false
+isPalindrome(List(1,2,2,1) ) == true
+isPalindrome(List("a", "b", "b", "a")) == true
+isPalindrome(List("c", "a", "r")) == false
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
    insert into problem (id,name,description,body,level,category,user_email)
   values (12,'Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
     '/* inspired by: http://www.4clojure.com/problem/41 */
-    /*Warning: For now, dont use two equals eg: [= =] in the method body. use equals() instead*/
 
 def dropEveryNth( l : List[Any], n : Int ) : List[Any] = {
   /*<*/

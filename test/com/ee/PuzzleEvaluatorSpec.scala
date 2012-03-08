@@ -118,7 +118,7 @@ false == ?""")
 addOne(1) == 2
 addOne(2) == 3"""
 
-        val expected = """//declare the list
+        val expected = PreparedPuzzleString.PREAMBLE + """
 var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
 def addOne(x:Int) : Int = x + 1
 __evalOut__ = __evalOut__ ::: List((1, addOne(1) == 2))
@@ -147,7 +147,7 @@ def capitalize(s: String) = {
 
 capitalize("man OF stEEL") == "Man Of Steel" """
 
-  val expected = """//declare the list
+  val expected = PreparedPuzzleString.PREAMBLE + """
 var __evalOut__ : List[Tuple2[Int,Boolean]] = List()
 __evalOut__ = __evalOut__ ::: List((0, "hello world" .toUpperCase == "HELLO WORLD"))
 __evalOut__ = __evalOut__ ::: List((2, "HELLO WORLD" .toLowerCase == "hello world"))

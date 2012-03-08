@@ -72,12 +72,17 @@ object TaggedStringProcessor {
     }
 
     val CodeRegex = buildRegexFromTemplate(template)
-
-    val CodeRegex(matchedGroups @ _*) = original
     
-    val body = processMiddleMatches( matchedGroups.tail.dropRight(1), action)
+    try{
+      val CodeRegex(matchedGroups @ _*) = original
+      val body = processMiddleMatches( matchedGroups.tail.dropRight(1), action)
+      matchedGroups.head + body + matchedGroups.last
+    }
+    catch{
+      case ex : Exception => original
+    }
     
-    matchedGroups.head + body + matchedGroups.last
+    
   }
 
   /**
@@ -87,7 +92,7 @@ object TaggedStringProcessor {
    * '\*hello\*'
    */
   private def escapeRegexChars( s : String ) : String = {
-    val EscapeChars = "{}()[].*|"
+    val EscapeChars = "{}()[].*|+$^?\\"
     val EscapePattern = "([" + EscapeChars.toCharArray().toList.map("\\" + _).mkString("|")+ "])"
     EscapePattern.r.replaceAllIn(s, "\\\\$1")
   }

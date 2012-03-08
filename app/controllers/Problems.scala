@@ -5,6 +5,7 @@ import scala.util.matching.Regex
 import com.codahale.jerkson.Json.generate
 import com.ee.EvaluationResult
 import com.ee.PuzzleEvaluator
+import com.ee.string.TaggedStringProcessor
 
 import controllers.Application.BrowserRestrict
 import controllers.Secured
@@ -103,19 +104,42 @@ object Problems extends Controller with Secured {
 
   def solve() = Action { implicit request => 
 
-    getFormParameter( Params.SOLUTION )  match {
-      case None => Ok( generate( ResponseWithMessage(false, "No solution provided")) )
-      case Some(solution) => {
+    getFormParameters( Params.SOLUTION, Params.ID )  match {
+      case List(None,None) => Ok( generate( ResponseWithMessage(false, "No solution provided")) )
+      //TODO: Allow a solution with no id to be solved for the moment, but will need to remove this.
+      case List(Some(solution), None) => {
         val evaluationResponse : EvaluationResult = PuzzleEvaluator.solve(solution)
+        val output = ResponseWithResults(evaluationResponse.successful, evaluationResponse)
+        val generated = generate(output)
+        Ok(generate(output)).withHeaders(Json)
+      }
+      case List(Some(solution), Some(id)) => {
+        //get the tagged solution so we can process the user solution if it contains ==
+        val taggedSolution : String = Problem.findById(id.toLong, false).body
+        
+        def escape(t:Tuple2[String,String])(s:String) = s.replace(t._1, t._2)
+        val escapeDoubleEq = escape(("==", "_!double_eq!_"))(_)
+        val unEscapeDoubleEq = escape(("_!double_eq!_", "=="))(_)
 
-        if( evaluationResponse.successful ){
-          storeSolutionIfLoggedIn( solution )
+        def preProcess(template:String)(solution:String) : String 
+          = TaggedStringProcessor.process(solution, template, escapeDoubleEq, "/*<*/", "/*>*/" )
+        
+        val escapeDoubleEqWithinTags = preProcess(taggedSolution)(_)
+        
+        val evaluationResponse : EvaluationResult 
+          = PuzzleEvaluator.solve(solution, 
+                Option(escapeDoubleEqWithinTags), 
+                Option(unEscapeDoubleEq))
+
+        if(evaluationResponse.successful){
+          storeSolutionIfLoggedIn(solution)
         }
         val output = ResponseWithResults(evaluationResponse.successful, evaluationResponse)
         val generated = generate(output)
         
-        Ok( generate(output) ).withHeaders(Json)
+        Ok(generate(output)).withHeaders(Json)
       }
+      case _ => Ok(generate(ResponseWithMessage(false, "Unknown Error")))
     }
   }
 

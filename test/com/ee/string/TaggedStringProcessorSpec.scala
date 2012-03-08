@@ -25,6 +25,14 @@ class TaggedStringProcessorSpec extends Specification {
       c must equalTo( "x !! y, blah") 
     }
 
+
+    "if an error is thrown it returns the source string" in {
+      val tweak = (s:String) => s.replace("=", "!")
+      val c = TaggedStringProcessor.process("false", "x <..>, blah", tweak, "<", ">")
+      c must equalTo( "false") 
+    }
+
+
     def assertProcess(base : String, fn : String => String, expectedChangeList : List[String]) = {
       val solution = base.replace("/*<*/", "").replace("/*>*/", "")
       var expected = solution
@@ -72,6 +80,27 @@ isPalindrome( List("c", "a", "r")) == false
 """
   assertProcess(base, RemoveEqEq, List("cheeky == ?", "one == two", "l.head == l.last"))
     
+    }
+
+    "can process despite regex chars" in {
+
+      val base = """
+
+def isOne(m:Int) : Boolean = /*<*/m == 1/*>*/
+\
+?
+*
+^
+.
+{}
+()
+|
+$
+def three() = 1 + 2
+"""
+      assertProcess(base, RemoveEqEq, List("m == 1"))
+
+
     }
     
   }
