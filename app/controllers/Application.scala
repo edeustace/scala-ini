@@ -18,9 +18,6 @@ import play.api._
 import play.api._
 import views._
 
-
-
-
 object Application extends Controller {
 
   case class BrowserRestrict[A](action: Action[A]) extends Action[A] {
@@ -28,7 +25,7 @@ object Application extends Controller {
     def apply(request: Request[A]): Result = {
       request.headers.get("USER-AGENT") match {
         case Some(userAgent) => {
-          BrowserCheck.isPermitted( userAgent ) match {
+          BrowserCheck.isPermitted(userAgent) match {
             case true => action(request)
             case false => Redirect("/not_supported")
           }
