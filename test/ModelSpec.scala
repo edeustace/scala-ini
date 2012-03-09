@@ -9,20 +9,13 @@ class ModelSpec extends Specification {
   
   import models._
 
-  // -- Date helpers
-  
-  def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str
-  
-  // --
-  
-  "Problem" should {
+  "User" should {
     
-    "be retrieved by id" in {
-      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+    "be retrieved by email" in {
+      running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
         
-        val prob = Problem.findById(1)
-        prob.user_email must equalTo("ed.eustace@gmail.com")
-        prob.user_name must equalTo("ed eustace")
+        val user = User.findByEmail("ed.eustace@gmail.com")
+        user.email must equalTo("ed.eustace@gmail.com")
         
       }
     }
