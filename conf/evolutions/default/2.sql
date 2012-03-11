@@ -288,7 +288,7 @@ keepEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(3,6)
 
 
 insert into "problem" (name,description,body,level,category,user_email)
-  values(14, 'Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
+  values('Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
 '
 import scala.xml._
 

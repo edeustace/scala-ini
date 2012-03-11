@@ -9,16 +9,11 @@ class ModelSpec extends Specification {
   
   import models._
 
-  "User" should {
+  "todo" should {
     
-    "be retrieved by email" in {
-      running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
-        
-        val user = User.findByEmail("ed.eustace@gmail.com")
-        user.email must equalTo("ed.eustace@gmail.com")
-        
-      }
-    }
+    "be done.." in {
+      "todo" must equalTo("not done")
+    }.pendingUntilFixed("do i need this anymore?")
     
   }
   

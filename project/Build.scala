@@ -9,12 +9,24 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-      "postgresql" % "postgresql" % "9.1-901.jdbc4"
+      "postgresql" % "postgresql" % "9.1-901.jdbc4",
+      "org.scala-lang" % "scala-compiler" % "2.9.1"
+            
 
     )
 
     val main = PlayProject(appName, appVersion, appDependencies, mainLang = SCALA).settings(
-      // Add your own project settings here      
+      // Add your own project settings here  
+
+      commands ++= Seq(hello)    
     )
+
+
+    // A simple, no-argument command that prints "Hi",
+	//  leaving the current state unchanged.
+	def hello = Command.command("hello") { state =>
+		println("Hi!")
+		state
+	}
 
 }

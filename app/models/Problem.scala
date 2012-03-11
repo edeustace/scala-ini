@@ -9,16 +9,13 @@ import anorm._
 import anorm.SqlParser._
 
 object ProblemMasker {
-
-
   def mask(s:String) : String = {
 
     val expr = """(?s)/\*<\*/.*?/\*>\*/""".r
     expr.replaceAllIn( s, "?" )
   }
-
-
 }
+
 case class Problem(id: Pk[Long], 
                   name: String, 
                   description: String, 
