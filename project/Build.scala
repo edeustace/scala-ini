@@ -9,7 +9,8 @@ object ApplicationBuild extends Build {
 
     val appDependencies = Seq(
       // Add your project dependencies here,
-      "postgresql" % "postgresql" % "9.1-901.jdbc4"
+      "postgresql" % "postgresql" % "9.1-901.jdbc4",
+      "org.scala-lang" % "scala-compiler" % "2.9.1"
 
     )
 
