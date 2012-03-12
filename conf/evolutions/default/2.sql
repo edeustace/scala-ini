@@ -2,12 +2,12 @@
 
 # --- !Ups
 
-insert into "user" (email,name,password) 
+insert into app_user (email,name,password) 
   values ('ed.eustace@gmail.com','ed eustace','password');
-insert into "user" (email,name,password) 
+insert into app_user (email,name,password) 
   values ('edeustace@yahoo.com','ed eustace','password');
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
 	values ('The basics','Some simple tests to get you started','//booleans
 true == /*<*/true/*>*/
 false == /*<*/false/*>*/
@@ -21,7 +21,7 @@ false == /*<*/false/*>*/
 'easy', 'basics', 'ed.eustace@gmail.com');
 
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
   values ('String','Some basic string manipulations',
 '"hello world" .toUpperCase == /*<*/"HELLO WORLD"/*>*/
 
@@ -40,7 +40,7 @@ capitalize("man OF stEEL") == "Man Of Steel"'
 ,
 'easy', 'string', 'ed.eustace@gmail.com');
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
   values ('Functions','Some basic functions',
 '//def defines a function
 def addOne(m: Int): Int = m + 1
@@ -64,7 +64,7 @@ three == /*<*/3/*>*/'
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
   values ('Anonymous Functions','Some anonymous functions',
 '/*inspired by http://twitter.github.com/scala_school/basics.html */
 //we can assign an anonymous function to a val
@@ -85,7 +85,7 @@ addOne(2) == /*<*/3/*>*/
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
   values ('Partial application of functions','Some examples of partially applied functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 //You can partially apply a function with an underscore, which gives you another function.
@@ -103,7 +103,7 @@ add3(2) == 5
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into "problem" (name,description,body,level,category,user_email) 
+insert into problem (name,description,body,level,category,user_email) 
   values ('Curried functions','Some examples of curried functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 def multiply(m: Int)(n: Int): Int = m * n
@@ -127,7 +127,7 @@ adderCurried(1)(2) == 3
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-  insert into "problem" (name,description,body,level,category,user_email) 
+  insert into problem (name,description,body,level,category,user_email) 
   values ('Traits','Simple traits',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 trait And {
@@ -154,7 +154,7 @@ birds.and == "bees"
 ,
 'easy', 'traits', 'ed.eustace@gmail.com');
 
-insert into "problem" (name,description,body,level,category,user_email)
+insert into problem (name,description,body,level,category,user_email)
   values ('Interleave', 'Write a function called "interleave" that interleaves 2 lists', 
     'def interleave( a: List[Any], b: List[Any] ) : List[Any] = {
     /*<*/
@@ -179,7 +179,7 @@ val resultTwo = interleave(List(1,2,3,4,5), List("a","b"))
 val expectedTwo = List(1,"a",2,"b")
 resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
 
-  insert into "problem" (name,description,body,level,category,user_email)
+  insert into problem (name,description,body,level,category,user_email)
   values ('Lists', 'Some simple list puzzles', 
     '
     val myList = List(1,2,3,4,5,6)
@@ -191,7 +191,7 @@ resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 
-  insert into "problem" (name,description,body,level,category,user_email)
+  insert into problem (name,description,body,level,category,user_email)
   values ('Pattern matching', 'Simple pattern matching', 
     'def numberAsWord(i:Int) : String = i match {
   case 1 => "one"
@@ -218,7 +218,7 @@ wordAsNumber("blah") == -1
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 
-   insert into "problem" (name,description,body,level,category,user_email)
+   insert into problem (name,description,body,level,category,user_email)
   values ('Palindrome detector', 'Write a function that finds palindromes', 
     '/*Inspired by: http://www.4clojure.com/problem/27 */
 def isPalindrome( l : List[Any] ) : Boolean = l match {
@@ -241,7 +241,7 @@ isPalindrome(List("a", "b", "b", "a")) == true
 isPalindrome(List("c", "a", "r")) == false
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
-   insert into "problem" (name,description,body,level,category,user_email)
+   insert into problem (name,description,body,level,category,user_email)
   values ('Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
     '/* inspired by: http://www.4clojure.com/problem/41 */
 
@@ -287,7 +287,7 @@ keepEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(3,6)
 
 
 
-insert into "problem" (name,description,body,level,category,user_email)
+insert into problem (name,description,body,level,category,user_email)
   values('Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
 '
 import scala.xml._
@@ -327,7 +327,7 @@ val updatedXml : Node = updateVersion(InputXml)
 
 
 
-insert into "user_solution" (user_email,problem_id, solution)
+insert into user_solution (user_email,problem_id, solution)
 		values ('ed.eustace@gmail.com',1, '//booleans
 true == true
 false == false
@@ -339,7 +339,7 @@ false == false
 6 / 2 - 1 == 2
 6 / (2 - 1) == 6');
 
-insert into "user_solution" (user_email,problem_id, solution)
+insert into user_solution (user_email,problem_id, solution)
 		values ('ed.eustace@gmail.com',2, '"hello world" .toUpperCase == "HELLO WORLD"
 
 "HELLO WORLD" .toLowerCase == "hello world"

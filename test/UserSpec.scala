@@ -11,7 +11,7 @@ class UserSpec extends Specification {
 
   "User" should {
     
-    /*"be retrieved by email" in {
+    "be retrieved by email" in {
       running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
         
         User.findByEmail("ed.eustace@gmail.com") match {
@@ -21,7 +21,7 @@ class UserSpec extends Specification {
         }
         
       }
-    }*/
+    }
 
     "list users" in {
 
@@ -30,6 +30,29 @@ class UserSpec extends Specification {
         val result = User.findAll
         result.length must equalTo(2)
       }
+
+    }
+
+    "can create and delete user" in {
+
+      running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
+        
+        User.create(User("ed2@ed.com","ed eustace 2","password"))
+
+        User.findByEmail("ed2@ed.com") match {
+          case Some(user) => user.name must equalTo("ed eustace 2")
+          case _ => throw new RuntimeException("can't find created user")
+
+        }
+
+        val success = User.deleteByEmail("ed2@ed.com")
+
+        success must equalTo(true)
+
+        User.findAll.length must equalTo(2)
+
+      }
+
 
     }
     

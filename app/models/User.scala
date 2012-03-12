@@ -11,28 +11,21 @@ case class User(email: String = "", name: String = "", password: String = "", so
 
 object User {
   
-  // -- Parsers
-  
-  val weird = {
-    get[String]("current_user") map {
-      case current_user => User(current_user)
-    }
-  }
   /**
    * Parse a User from a ResultSet
    */
   val simple = {
-    get[String]("email") ~
-    get[String]("name") ~
-    get[String]("password") map {
+    get[String]("app_user.email") ~
+    get[String]("app_user.name") ~
+    get[String]("app_user.password") map {
       case email~name~password => User(email, name, password)
     }
   }
 
   val withSolutioncount = {
-    get[String]("user.email") ~
-    get[String]("user.name") ~
-    get[String]("user.password") ~
+    get[String]("app_user.email") ~
+    get[String]("app_user.name") ~
+    get[String]("app_user.password") ~
     get[Long]("user.solution_count") map {
       case email~name~password~solution_count 
         => User(email, name, password, solution_count)
@@ -46,23 +39,17 @@ object User {
    */
   def findByEmail(email: String): Option[User] = {
 
-    //val query = "select * from \"user\" where email = '{email}'"
-    val query = "select * from \"user\" as u where u.email = '{email}'"
+    val query = "select * from app_user where email = {email}"
     val result = DB.withConnection { implicit connection =>
 
       val q =  SQL(query).on(
         'email -> email
       )
-      
-      
 
-      println( "q: " + q)
       SQL(query).on(
         'email -> email
       ).as(User.simple.singleOpt)
     }
-
-    println(result)
     result
   }
 
@@ -73,7 +60,7 @@ object User {
    */
   def findAll: Seq[User] = {
     DB.withConnection { implicit connection =>
-      SQL("select * from \"user\"").as(User.simple *)
+      SQL("select * from app_user").as(User.simple *)
     }
   }
 
@@ -107,7 +94,7 @@ object User {
     DB.withConnection { implicit connection =>
       SQL(
         """
-         select * from user where 
+         select * from app_user where 
          email = {email} and password = {password}
         """
       ).on(
@@ -124,7 +111,7 @@ object User {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          insert into user values (
+          insert into app_user values (
             {email}, {name}, {password}
           )
         """
@@ -139,11 +126,25 @@ object User {
     }
   }
 
+  def deleteByEmail(email:String):Boolean ={
+
+    DB.withConnection { implicit connection =>
+      SQL(
+        """
+          delete from app_user where email = {email}
+        """
+      ).on(
+        'email -> email
+      ).executeUpdate()
+    }
+    true
+  }
+
   def updatePassword(email:String, password:String) : Int = {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          update user
+          update app_user
           set password = {password}
           where email = {email}
         """
@@ -174,8 +175,8 @@ object User {
       
       val users = SQL(
         """
-          select * from user 
-          where user.name like {filter}
+          select * from app_user 
+          where app_user.name like {filter}
           order by {orderBy} nulls last
           limit {pageSize} offset {offset}
         """
@@ -188,8 +189,8 @@ object User {
 
       val totalRows = SQL(
         """
-          select count(*) from user 
-          where user.name like {filter}
+          select count(*) from app_user 
+          where app_user.name like {filter}
         """
       ).on(
         'filter -> filter
