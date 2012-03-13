@@ -180,8 +180,8 @@ object Problem {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          insert into problem values (
-            (select next value for problem_seq), 
+          insert into problem (name,description,body,level,category,user_email) 
+            values (
             {name}, {description}, {body}, {level}, {category}, {user_email}
           )
         """
