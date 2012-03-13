@@ -4,3 +4,14 @@ spec
 *.stats
 *junit*
 *selenium*
+selenium-java-2.16.1.jar
+selenium-android-driver-2.16.1.jar
+selenium-chrome-driver-2.16.1.jar
+selenium-htmlunit-driver-2.16.1.jar
+selenium-firefox-driver-2.16.1.jar
+selenium-ie-driver-2.16.1.jar
+selenium-iphone-driver-2.16.1.jar
+selenium-support-2.16.1.jar
+selenium-remote-driver-2.16.1.jar
+selenium-api-2.16.1.jar
+
