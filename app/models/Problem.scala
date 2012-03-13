@@ -123,7 +123,7 @@ object Problem {
               inner JOIN app_user as app_user
               on app_user.email = problem.user_email
           where problem.name like {filter}
-          order by {orderBy} nulls last
+          order by 1
           limit {pageSize} offset {offset}
         """
       ).on(

@@ -17,9 +17,9 @@ object UserSolution{
     
     get[Pk[Long]]("user_solution.id") ~
     get[String]("user_solution.user_email") ~
-    get[String]("user_solution.problem_id") ~
+    get[Long]("user_solution.problem_id") ~
     get[String]("user_solution.solution") map {
-      case id~user_email~problem_id~solution => UserSolution(id,user_email,problem_id.toLong,solution)
+      case id~user_email~problem_id~solution => UserSolution(id,user_email,problem_id,solution)
     }
   }
 
