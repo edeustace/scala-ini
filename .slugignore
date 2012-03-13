@@ -4,7 +4,7 @@ spec
 *.stats
 *junit*
 *selenium*
-selenium-java-2.16.1.jar
+*/**/selenium-java-2.16.1.jar
 selenium-android-driver-2.16.1.jar
 selenium-chrome-driver-2.16.1.jar
 selenium-htmlunit-driver-2.16.1.jar
