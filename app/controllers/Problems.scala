@@ -8,7 +8,6 @@ import com.ee.PuzzleEvaluator
 import com.ee.string.TaggedStringProcessor
 
 import controllers.Application.BrowserRestrict
-import controllers.Secured
 import models.NewProblem
 import models.Problem
 import models.User
@@ -76,12 +75,11 @@ object Problems extends Controller with Secured {
    * @param orderBy Column to be sorted
    * @param filter Filter applied on computer names
    */
-  def index(page: Int = 0, orderBy: Int = 1, filter: String = "") = BrowserRestrict {
+  def index(page: Int = 0, orderBy:Int = 1, filter: String = "") = BrowserRestrict {
     Action { implicit request =>
 
       val user : User = getUser(request)
       var solutions : Seq[UserSolution] = List()
-      Logger.debug("Problems.index :: user: " + user)
       if( user != null ){
         solutions = UserSolution.findSolutionsByEmail(user.email)  
       }
@@ -180,7 +178,7 @@ object Problems extends Controller with Secured {
                       case List(Some(name), Some(description), Some(level), Some(category)) => {
                         
                         //TODO: fix puzzle insertion
-                        //insertNewPuzzle(solution,name,description,level,category) 
+                        insertNewPuzzle(solution,name,description,level,category) 
                         ResponseWithMessage(true,SUBMITTED)
                       }
                       case _ => ResponseWithMessage(false, MISSING_ALL_FORM_VARS)

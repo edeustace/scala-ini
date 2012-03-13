@@ -152,15 +152,12 @@ object PuzzleEvaluator
       case _ => s
     }
     
-    Logger.debug(prePrepared)
     val prepared : String = (new PreparedPuzzleString)(prePrepared)
     
     val postPrepared = postPrepare match {
       case Some(fn) => fn(prepared)
       case _ => prepared
     }
-
-    Logger.debug(postPrepared)
     
     val result : List[Tuple2[Int,Boolean]] = rawEval(postPrepared)
     val evaluations = result.map((t:Tuple2[Int,Boolean]) => SingleEvaluationResult(t._2, t._1))

@@ -9,16 +9,13 @@ import anorm._
 import anorm.SqlParser._
 
 object ProblemMasker {
-
-
   def mask(s:String) : String = {
 
     val expr = """(?s)/\*<\*/.*?/\*>\*/""".r
     expr.replaceAllIn( s, "?" )
   }
-
-
 }
+
 case class Problem(id: Pk[Long], 
                   name: String, 
                   description: String, 
@@ -75,7 +72,7 @@ object Problem {
     get[String]("problem.level") ~
     get[String]("problem.category") ~
     get[String]("problem.user_email") ~
-    get[String]("user.name")  map {
+    get[String]("app_user.name")  map {
       case id~name~description~body~level~category~user_email~user_name 
         => Problem(id, name, description, body, level, category, user_email, user_name)
     }
@@ -91,8 +88,8 @@ object Problem {
   def findById(id: Long, maskSolution:Boolean = true): Problem = {
     val opt : Option[Problem] = DB.withConnection { implicit connection =>
       SQL("""select * from problem as problem 
-              inner JOIN user as user
-              on user.email = problem.user_email
+              inner JOIN app_user as app_user
+              on app_user.email = problem.user_email
               where id = {id}""").on('id -> id).as(Problem.simple.singleOpt )
     }
     opt match {
@@ -123,10 +120,10 @@ object Problem {
       val problems = SQL(
         """
           select * from problem as problem 
-              inner JOIN user as user
-              on user.email = problem.user_email
+              inner JOIN app_user as app_user
+              on app_user.email = problem.user_email
           where problem.name like {filter}
-          order by {orderBy} nulls last
+          order by 1
           limit {pageSize} offset {offset}
         """
       ).on(

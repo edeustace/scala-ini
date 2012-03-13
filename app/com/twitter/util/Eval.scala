@@ -36,7 +36,7 @@ import scala.util.matching.Regex
 /**
  * Evaluate a file or string and return the result.
  */
-@deprecated("use a throw-away instance of Eval instead")
+@deprecated("use a throw-away instance of Eval instead", "")
 object Eval extends Eval {
   private val jvmId = java.lang.Math.abs(new Random().nextInt())
   val classCleaner: Regex = "\\W".r

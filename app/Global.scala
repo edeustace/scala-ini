@@ -11,17 +11,23 @@ object Global extends GlobalSettings {
 
   object InitialData {
 
-    def insert() = {
+    def insert() = { 
 
       def hashPassword(email:String) = {
-
+        //TODO: Move the data insertion to another point
+        //Where: 
+        //1. It should only happen once when the app boots
+        //2. It shouldn't re-hash the password if its already hashed
         val u = User.findByEmail(email)
         val user = u.getOrElse(User())
         u match {
           case None => println("ignoring: " + email)
           case Some(u) => {
-            val hashed = Codecs.sha1(u.password)
-            User.updatePassword( u.email, hashed)
+            val hashed = Codecs.sha1("password")
+            println("hashing password from: " + u.password + " to: " + hashed ) 
+            if( hashed != u.password ){
+              User.updatePassword( u.email, hashed)
+            }
           }
 
         }

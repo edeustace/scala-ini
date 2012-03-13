@@ -9,16 +9,11 @@ class ProblemSpec extends Specification {
   
   import models._
 
-  // -- Date helpers
-  
-  def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str
-  
-  // --
-  
+
   "Problem model" should {
     
     "be retrieved by id" in {
-      running(FakeApplication(additionalConfiguration = inMemoryDatabase())) {
+      running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
         
         val trueIsTrue = Problem.findById(1)
         trueIsTrue.user_email must equalTo("ed.eustace@gmail.com")

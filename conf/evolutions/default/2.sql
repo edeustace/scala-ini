@@ -2,11 +2,13 @@
 
 # --- !Ups
 
-insert into user (email,name,password) values ('ed.eustace@gmail.com','ed eustace','password');
-insert into user (email,name,password) values ('edeustace@yahoo.com','ed eustace','password');
+insert into app_user (email,name,password) 
+  values ('ed.eustace@gmail.com','ed eustace','password');
+insert into app_user (email,name,password) 
+  values ('edeustace@yahoo.com','ed eustace','password');
 
-insert into problem (id,name,description,body,level,category,user_email) 
-	values (1,'The basics','Some simple tests to get you started','//booleans
+insert into problem (name,description,body,level,category,user_email) 
+	values ('The basics','Some simple tests to get you started','//booleans
 true == /*<*/true/*>*/
 false == /*<*/false/*>*/
 
@@ -19,8 +21,8 @@ false == /*<*/false/*>*/
 'easy', 'basics', 'ed.eustace@gmail.com');
 
 
-insert into problem (id,name,description,body,level,category,user_email) 
-  values (2,'String','Some basic string manipulations',
+insert into problem (name,description,body,level,category,user_email) 
+  values ('String','Some basic string manipulations',
 '"hello world" .toUpperCase == /*<*/"HELLO WORLD"/*>*/
 
 "HELLO WORLD" /*<*/.toLowerCase/*>*/ == "hello world"
@@ -38,8 +40,8 @@ capitalize("man OF stEEL") == "Man Of Steel"'
 ,
 'easy', 'string', 'ed.eustace@gmail.com');
 
-insert into problem (id,name,description,body,level,category,user_email) 
-  values (3,'Functions','Some basic functions',
+insert into problem (name,description,body,level,category,user_email) 
+  values ('Functions','Some basic functions',
 '//def defines a function
 def addOne(m: Int): Int = m + 1
 addOne(1) == /*<*/2/*>*/
@@ -62,8 +64,8 @@ three == /*<*/3/*>*/'
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into problem (id,name,description,body,level,category,user_email) 
-  values (4,'Anonymous Functions','Some anonymous functions',
+insert into problem (name,description,body,level,category,user_email) 
+  values ('Anonymous Functions','Some anonymous functions',
 '/*inspired by http://twitter.github.com/scala_school/basics.html */
 //we can assign an anonymous function to a val
 val addOne = (x: Int) => x + 1
@@ -83,8 +85,8 @@ addOne(2) == /*<*/3/*>*/
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into problem (id,name,description,body,level,category,user_email) 
-  values (5,'Partial application of functions','Some examples of partially applied functions',
+insert into problem (name,description,body,level,category,user_email) 
+  values ('Partial application of functions','Some examples of partially applied functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 //You can partially apply a function with an underscore, which gives you another function.
 def adder(m: Int, n: Int) = m + n
@@ -101,8 +103,8 @@ add3(2) == 5
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-insert into problem (id,name,description,body,level,category,user_email) 
-  values (6,'Curried functions','Some examples of curried functions',
+insert into problem (name,description,body,level,category,user_email) 
+  values ('Curried functions','Some examples of curried functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 def multiply(m: Int)(n: Int): Int = m * n
 
@@ -125,8 +127,8 @@ adderCurried(1)(2) == 3
 ,
 'easy', 'functions', 'ed.eustace@gmail.com');
 
-  insert into problem (id,name,description,body,level,category,user_email) 
-  values (7,'Traits','Simple traits',
+  insert into problem (name,description,body,level,category,user_email) 
+  values ('Traits','Simple traits',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 trait And {
     def and() : String = "whatever!"
@@ -152,8 +154,8 @@ birds.and == "bees"
 ,
 'easy', 'traits', 'ed.eustace@gmail.com');
 
-insert into problem (id,name,description,body,level,category,user_email)
-  values (8,'Interleave', 'Write a function called "interleave" that interleaves 2 lists', 
+insert into problem (name,description,body,level,category,user_email)
+  values ('Interleave', 'Write a function called "interleave" that interleaves 2 lists', 
     'def interleave( a: List[Any], b: List[Any] ) : List[Any] = {
     /*<*/
        a match{
@@ -177,8 +179,8 @@ val resultTwo = interleave(List(1,2,3,4,5), List("a","b"))
 val expectedTwo = List(1,"a",2,"b")
 resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
 
-  insert into problem (id,name,description,body,level,category,user_email)
-  values (9,'Lists', 'Some simple list puzzles', 
+  insert into problem (name,description,body,level,category,user_email)
+  values ('Lists', 'Some simple list puzzles', 
     '
     val myList = List(1,2,3,4,5,6)
     myList.map( _ + 5 ) == /*<*/(6,7,8,9,10,11)/*>*/
@@ -189,8 +191,8 @@ resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 
-  insert into problem (id,name,description,body,level,category,user_email)
-  values (10,'Pattern matching', 'Simple pattern matching', 
+  insert into problem (name,description,body,level,category,user_email)
+  values ('Pattern matching', 'Simple pattern matching', 
     'def numberAsWord(i:Int) : String = i match {
   case 1 => "one"
   case 2 => "two"
@@ -216,8 +218,8 @@ wordAsNumber("blah") == -1
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
 
-   insert into problem (id,name,description,body,level,category,user_email)
-  values (11,'Palindrome detector', 'Write a function that finds palindromes', 
+   insert into problem (name,description,body,level,category,user_email)
+  values ('Palindrome detector', 'Write a function that finds palindromes', 
     '/*Inspired by: http://www.4clojure.com/problem/27 */
 def isPalindrome( l : List[Any] ) : Boolean = l match {
     /*<*/
@@ -239,8 +241,8 @@ isPalindrome(List("a", "b", "b", "a")) == true
 isPalindrome(List("c", "a", "r")) == false
     ', 'simple', 'functions', 'ed.eustace@gmail.com');
 
-   insert into problem (id,name,description,body,level,category,user_email)
-  values (12,'Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
+   insert into problem (name,description,body,level,category,user_email)
+  values ('Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
     '/* inspired by: http://www.4clojure.com/problem/41 */
 
 def dropEveryNth( l : List[Any], n : Int ) : List[Any] = {
@@ -285,8 +287,8 @@ keepEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(3,6)
 
 
 
-insert into problem (id,name,description,body,level,category,user_email)
-  values(14, 'Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
+insert into problem (name,description,body,level,category,user_email)
+  values('Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
 '
 import scala.xml._
 
