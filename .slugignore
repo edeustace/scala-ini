@@ -2,3 +2,5 @@ test
 *.ai
 spec
 *.stats
+*junit*
+*selenium*
