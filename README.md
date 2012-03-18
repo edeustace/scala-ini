@@ -6,6 +6,12 @@ Source code for [scalapuzzles.org](http://scalapuzzles.org) - inspired by 4cloju
 # Installation
 
 Install [Play20](https://github.com/playframework/Play20)
+Install [PostgreSql](http://www.postgresql.org/)
+
+You will need to create a user and database for the tests and for the normal app. For test create a user: scalaini:hello and a 
+db called scalaini_test
+
+The db for the regular app you configure through an environment variable DATABASE_URL. So set that to whatever you want.
 
 Then
 
@@ -14,23 +20,7 @@ Then
     play run
 
 
-# Todo
-* dev:
- - when testing user should migrate the test db beforehand, when the tests are run the db should be reseeded
- - when developing the db should be migrated and reseeded before the server is run
- - when live to perform a migration the db should be backed up, migrated, any additional data should be seeded then.
 
-the migrations/evolutions should only contain schema changes
-there should be a separate mechanism for populating the db
-
-play
-db:test:prepare (custom command)
-test (before each test have the db reset, run some scala code to add the data)
-
-play
-db:prepare (custom command)
-db:seed (custom command)
-run (disable evolutions)
 
 
 
