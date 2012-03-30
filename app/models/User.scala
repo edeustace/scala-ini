@@ -157,11 +157,11 @@ object User {
   }
 
    /**
-   * Return a page of (Problem,Company).
+   * Return a page of (Puzzle,Company).
    *
    * @param page Page to display
-   * @param pageSize Number of problems per page
-   * @param orderBy Problem property used for sorting
+   * @param pageSize Number of puzzles per page
+   * @param orderBy Puzzle property used for sorting
    * @param filter Filter applied on the name column
    */
   def list(page: Int = 0, 

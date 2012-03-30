@@ -23,7 +23,7 @@ class @com.ee.RunButton
     null      
 
 
-class @com.ee.ProblemsView
+class @com.ee.PuzzlesView
 
   ###
   #
@@ -34,27 +34,27 @@ class @com.ee.ProblemsView
   # should the user choose that link.
   #
   # 
-  # <span>Solved: @countSolutions() of @countProblems()</span>
+  # <span>Solved: @countSolutions() of @countPuzzles()</span>
   ###
-  constructor: (@solveUrl, @editor, @problems,  @existingSolutions)->
-    console.log "ProblemsView constructor solveUrl: #{@solveUrl}"
+  constructor: (@solveUrl, @editor, @puzzles,  @existingSolutions)->
+    console.log "PuzzlesView constructor solveUrl: #{@solveUrl}"
     @processor = new com.ee.string.StringUpdateProcessor()
     @hook = new com.ee.string.AceEditorHook @editor, @processor
     @runButton = new com.ee.RunButton("#runButton", (e) => @onRunButtonClick e)
     null
 
   ###
-  # @param problemId - the first problem to open
-  # @parm solvedSoFar - the number of problems solved so far
-  # @param totalProblems - the total number of problems
+  # @param puzzleId - the first puzzle to open
+  # @parm solvedSoFar - the number of puzzles solved so far
+  # @param totalPuzzles - the total number of puzzles
   ###
-  init: (problemId, @solvedSoFar, @totalProblems )->
-    @problemId = problemId
-    console.log "init with id: #{@problemId}"
+  init: (puzzleId, @solvedSoFar, @totalPuzzles )->
+    @puzzleId = puzzleId
+    console.log "init with id: #{@puzzleId}"
     @bindListenersToEditor()
     @initPuzzleLinks()
     @initPreviousNextButtons()
-    @moveToProblem @problemId
+    @moveToPuzzle @puzzleId
     @updateSolvedInfo 0
     null
 
@@ -65,7 +65,7 @@ class @com.ee.ProblemsView
     @runButton.loading true
 
     params = 
-      id: @problemId, 
+      id: @puzzleId, 
       solution: window.ace.editor.getSession().getValue()
     
     $.post( @solveUrl, 
@@ -86,7 +86,7 @@ class @com.ee.ProblemsView
 
       setTimeout( => 
         @clearEvaluations()
-        @moveToNextProblem()
+        @moveToNextPuzzle()
       , 1000 )
       
       @updateSolvedInfo 1
@@ -158,14 +158,14 @@ class @com.ee.ProblemsView
     null
 
   onPuzzleLinkClick: (e) ->
-    newId = $(e.target).closest(".puzzle-container").attr("data-problem-id")
+    newId = $(e.target).closest(".puzzle-container").attr("data-puzzle-id")
     newId = parseInt newId
-    @moveToProblem newId
+    @moveToPuzzle newId
     @updatePrevNextButtons()
     null
 
   markTestSuccessful: ->
-    $("#_problem_#{@problemId}")
+    $("#_puzzle_#{@puzzleId}")
       .find(".icon-cog")
       .removeClass("icon-cog")
       .removeClass("grey-bg")
@@ -174,38 +174,38 @@ class @com.ee.ProblemsView
     null
 
   storeSolution: (solution) ->
-    @existingSolutions[@problemId.toString()] = solution
+    @existingSolutions[@puzzleId.toString()] = solution
     null
 
-  moveToProblem: (newProblemId) ->
+  moveToPuzzle: (newPuzzleId) ->
 
     @clearEvaluations()
-    @problemId = newProblemId
-    problem = @_getProblemForProblemId() 
-    $("#main-puzzle-title").html(problem.title)
+    @puzzleId = newPuzzleId
+    puzzle = @_getPuzzleForPuzzleId() 
+    $("#main-puzzle-title").html(puzzle.title)
 
-    subheader = "#{problem.description} by #{problem.user}"
+    subheader = "#{puzzle.description} by #{puzzle.user}"
     $("#main-puzzle-subheader").html(subheader)
 
     $(".puzzle-container").removeClass("selected")
-    $("#_problem_#{@problemId}").addClass("selected")
+    $("#_puzzle_#{@puzzleId}").addClass("selected")
     @updateEditor()
     null
 
-  _getProblemForProblemId: ->
-    problemIndex = @getCurrentProblemArrayIndex()
-    @problems[problemIndex]
+  _getPuzzleForPuzzleId: ->
+    puzzleIndex = @getCurrentPuzzleArrayIndex()
+    @puzzles[puzzleIndex]
   
 
   updateEditor: ->
-    problem = @_getProblemForProblemId @problemId
-    code = problem.code
+    puzzle = @_getPuzzleForPuzzleId @puzzleId
+    code = puzzle.code
 
     if @processor?
       @processor.init code
         
-    if @existingSolutions[@problemId]?
-      @editor.getSession().setValue @existingSolutions[@problemId]
+    if @existingSolutions[@puzzleId]?
+      @editor.getSession().setValue @existingSolutions[@puzzleId]
     else
       @editor.getSession().setValue code 
     null
@@ -232,7 +232,7 @@ class @com.ee.ProblemsView
     null
 
 
-  moveToNextProblem: ->
+  moveToNextPuzzle: ->
     @_onPrevNextClick 1
     null
   
@@ -247,32 +247,32 @@ class @com.ee.ProblemsView
   _onPrevNextClick: (increment) ->
     nextId = @getNextId increment
     return if nextId == -1
-    @moveToProblem nextId 
+    @moveToPuzzle nextId 
     @updatePrevNextButtons()
     null
 
  
   getNextId: (increment) ->
-    realIndex = @getCurrentProblemArrayIndex()
+    realIndex = @getCurrentPuzzleArrayIndex()
     newIndex =  realIndex + increment
-    @getProblemIdAtIndex newIndex
+    @getPuzzleIdAtIndex newIndex
 
-  getProblemIdAtIndex: (arrayIndex) ->
-    problem = @problems[arrayIndex]
+  getPuzzleIdAtIndex: (arrayIndex) ->
+    puzzle = @puzzles[arrayIndex]
 
-    if problem?
-      problem.id
+    if puzzle?
+      puzzle.id
     else
       -1
 
-  getCurrentProblemArrayIndex: ->
-    for index, problem of @problems
-      if problem.id == @problemId
+  getCurrentPuzzleArrayIndex: ->
+    for index, puzzle of @puzzles
+      if puzzle.id == @puzzleId
         return parseInt(index)
     
-    throw "Can't find array index for problem id: #{@problemId}"
+    throw "Can't find array index for puzzle id: #{@puzzleId}"
 
   updateSolvedInfo: (increment)->
-    @solvedSoFar += increment if @solvedSoFar < @totalProblems
-    $("#solvedInfo").html("Solved #{@solvedSoFar} of #{@totalProblems}")
+    @solvedSoFar += increment if @solvedSoFar < @totalPuzzles
+    $("#solvedInfo").html("Solved #{@solvedSoFar} of #{@totalPuzzles}")
     null

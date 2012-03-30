@@ -6,7 +6,7 @@ import com.ee.BrowserCheck
 
 import models._
 import models._
-import models.Problem
+import models.Puzzle
 import play.api.data.Forms._
 import play.api.data._
 import play.api.libs.json.Json._
@@ -77,7 +77,7 @@ object Application extends Controller {
   def completeSignup = Action{ implicit request => 
     signUpForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.signup(formWithErrors)),
-      user => Redirect(routes.Problems.index).withSession("email" -> user._1)
+      user => Redirect(routes.Puzzles.index).withSession("email" -> user._1)
       )
   }
 
@@ -87,7 +87,7 @@ object Application extends Controller {
   def authenticate = Action { implicit request =>
     loginForm.bindFromRequest.fold(
       formWithErrors => BadRequest(html.login(formWithErrors)),
-      user => Redirect(routes.Problems.index).withSession("email" -> user._1)
+      user => Redirect(routes.Puzzles.index).withSession("email" -> user._1)
     )
   }
 
@@ -106,7 +106,7 @@ object Application extends Controller {
     import routes.javascript._
     Ok(
       Routes.javascriptRouter("jsRoutes")(
-        Problems.index, Problems.show, Problems.testAuthentication
+        Puzzles.index, Puzzles.show, Puzzles.testAuthentication
       )
     ).as("text/javascript") 
   }
@@ -167,7 +167,7 @@ trait Secured {
    * Check if the connected user is a member of this project.
    */
   def IsMemberOf(project: Long)(f: => String => Request[AnyContent] => Result) = IsAuthenticated { user => request =>
-    if(Problem.isUserOwner(project, user)) {
+    if(Puzzle.isUserOwner(project, user)) {
       f(user)(request)
     } else {
       Results.Forbidden

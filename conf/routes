@@ -13,13 +13,16 @@ GET      /users                     controllers.Users.index()
 GET      /users/:email              controllers.Users.show(email)
 
 # Home page
-GET     /                           controllers.Problems.index()
-GET     /problems                   controllers.Problems.index()
-GET		/problems/new				controllers.Problems.submitPuzzlePage()
-POST	/problems/new/submit 		controllers.Problems.solveAndSubmit()
-GET     /problems/authenticate      controllers.Problems.testAuthentication()
-GET     /problems/:id               controllers.Problems.show(id)
-POST    /problems/solve             controllers.Problems.solve()
+GET     /                           controllers.Puzzles.index()
+GET     /puzzles                   controllers.Puzzles.index()
+GET		/puzzles/new				controllers.Puzzles.submitPuzzlePage()
+GET		/puzzles/create				controllers.Puzzles.createPuzzlePage()
+POST	/puzzles/save			controllers.Puzzles.save()
+POST	/puzzles/new/submit 		controllers.Puzzles.solveAndSubmit()
+GET     /puzzles/authenticate      controllers.Puzzles.testAuthentication()
+GET     /puzzles/:id               controllers.Puzzles.show(id)
+GET     /puzzles/key/:urlKey               controllers.Puzzles.showByUrlKey(urlKey)
+POST    /puzzles/solve             controllers.Puzzles.solve()
 
 GET     /not_supported              controllers.Application.notSupported()
 

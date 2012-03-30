@@ -4,7 +4,7 @@
 
 
 @postBodyScript = {
-<script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/PuzzlesView.js")"></script>
 <script type="text/javascript">
   
   $(document).ready(function(){
@@ -20,22 +20,22 @@
       window.ace = (window.ace || {});
       window.ace.editor = editor;
 
-      console.log("setting url to: /problems/solve")
+      console.log("setting url to: /puzzles/solve")
 
       var existingSolutions = {};
 
       
 
-        var view = new com.ee.ProblemsView("/problems/solve_raw", 
+        var view = new com.ee.PuzzlesView("/puzzles/solve_raw", 
             editor, 
             editor.getSession().getValue(),
             existingSolutions
             );
 
       var solvedSoFar = 0;
-      var totalProblems = 0; 
+      var totalPuzzles = 0; 
       var firstUnsolvedId = 1;
-      view.init(firstUnsolvedId, solvedSoFar, totalProblems);
+      view.init(firstUnsolvedId, solvedSoFar, totalPuzzles);
       
       editor.commands.addCommand({
           name: 'myCommand',

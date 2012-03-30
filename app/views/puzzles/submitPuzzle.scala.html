@@ -88,13 +88,13 @@
       window.ace = (window.ace || {});
       window.ace.editor = editor;
 
-      console.log("setting url to: /problems/solve")
+      console.log("setting url to: /puzzles/solve")
 
       var existingSolutions = {};
 
       var view = new com.ee.SubmitPuzzleView(
-          "/problems/solve",
-          "/problems/new/submit", 
+          "/puzzles/solve",
+          "/puzzles/new/submit", 
           editor, 
           editor.getSession().getValue(),
           "@Html(puzzleStart)",

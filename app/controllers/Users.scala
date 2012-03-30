@@ -3,7 +3,7 @@ package controllers
 import play.api._
 import play.api.mvc._
 import models._
-import models.Problem
+import models.Puzzle
 import scala.tools.nsc._
 import com.twitter.util.Eval
 import play.api.http.ContentTypes

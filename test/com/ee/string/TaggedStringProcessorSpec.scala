@@ -59,7 +59,7 @@ class TaggedStringProcessorSpec extends Specification {
 
     "process a more complex puzzle" in {
     
-      val base = """/*Inspired by: http://www.4clojure.com/problem/27 */
+      val base = """/*Inspired by: http://www.4clojure.com/puzzle/27 */
     /*Warning: For now, dont use two equals eg: [= =] in the method body. use equals() instead*/
 def isPalindrome( l : List[Any] ) : Boolean = l match {
     /*<*/

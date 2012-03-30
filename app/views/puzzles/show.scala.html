@@ -1,15 +1,15 @@
-@(message : String, problem : Problem, user:User = null)(implicit flash: play.api.mvc.Flash) 
+@(message : String, puzzle : Puzzle, user:User = null)(implicit flash: play.api.mvc.Flash) 
 
 
 @renderInputInline( test : String ) = {
         @Html(test.replace("?", "<input type='text'></input>"))
 }
-@main(message, user) { @problem.name
+@main(message, user) { @puzzle.name
 <br />
-@problem.description
+@puzzle.description
 <br />
 <div class="code-div">
-        <pre id="puzzle">@problem.body</pre>
+        <pre id="puzzle">@puzzle.body</pre>
 </div>
 
 
@@ -21,14 +21,14 @@
 </div>
 
 <div style="display: block; position: relative;">
-  <a id="solveLink" href="/problems/solve">go</a>
+  <a id="solveLink" href="/puzzles/solve">go</a>
 </div>
 <script type="text/javascript">
   var url = $("#solveLink").attr("href");
   $("#solveLink").attr("href", "javascript:void(0)");
   
   $("#solveLink").click(function(){
-    $.post( url, { id: @problem.id, solution: window.ace.editor.getSession().getValue() },
+    $.post( url, { id: @puzzle.id, solution: window.ace.editor.getSession().getValue() },
         function( data, textStatus,jqXHR ) {
         console.log(data);
         if( data.success == true ) {

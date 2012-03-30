@@ -6,10 +6,13 @@ import com.codahale.jerkson.Json.generate
 import com.ee.EvaluationResult
 import com.ee.PuzzleEvaluator
 import com.ee.string.TaggedStringProcessor
+import com.ee.puzzle.PuzzleRegex
 
 import controllers.Application.BrowserRestrict
-import models.NewProblem
-import models.Problem
+
+import models.NewPuzzle
+import models.Puzzle
+import models.PuzzleCaseClassHelper
 import models.User
 import models.UserSolution
 import play.api.mvc.Request
@@ -18,10 +21,10 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Controller
 import play.api.Logger
 
-case class ResponseWithMessage(successful:Boolean, message : String)
+case class ResponseWithMessage(successful:Boolean, message : String, id:Long = -1, urlKey:String = "")
 case class ResponseWithResults(successful:Boolean, result : EvaluationResult)
 
-object Problems extends Controller with Secured {
+object Puzzles extends Controller with Secured {
   
   
   val Json = ("Content-Type" -> "application/json; charset=utf-8")
@@ -35,12 +38,6 @@ object Problems extends Controller with Secured {
 
   val EXPECTED_TRUE_GOT_FALSE = "Expected true but got false"
 
-  object PuzzleRegex{
-    val BEGIN = "/*<*/"
-    val END = "/*>*/"
-    def escape( s : String ) : String = s.replace("*", "\\*")
-    val ValidPuzzle = new Regex("(.*)" + escape(BEGIN) + "(.*)"+ escape(END) +"(.*)")
-  }
 
   object Params {
     val SOLUTION = "solution"
@@ -52,10 +49,14 @@ object Problems extends Controller with Secured {
   }
 
   
+  def createPuzzlePage = BrowserRestrict{ Action{
+      Ok(views.html.puzzles.createPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
+  }}
+  
   
   def submitPuzzlePage = IsAuthenticated { username => _ =>
     User.findByEmail(username).map{ user => 
-      Ok(views.html.problems.submitPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
+      Ok(views.html.puzzles.submitPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
     }.getOrElse(Forbidden)
   }
   
@@ -68,6 +69,12 @@ object Problems extends Controller with Secured {
     }.getOrElse(Forbidden)
   }
  
+  def save = Action{ implicit request => 
+    Logger.debug("save puzzle")
+    val response = processSolution(insertPuzzleOnly)  
+    Ok(generate(response)).withHeaders(Json)
+  }
+
   /**
    * Display the paginated list of computers.
    *
@@ -84,20 +91,24 @@ object Problems extends Controller with Secured {
         solutions = UserSolution.findSolutionsByEmail(user.email)  
       }
       
-      Ok(views.html.problems.list(
+      Ok(views.html.puzzles.list(
         "Scala Puzzles",
-        Problem.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")),orderBy, filter, user, solutions )
+        Puzzle.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%")),orderBy, filter, user, solutions )
       )
     }
   }
 
+  def showByUrlKey(key:String) = Action{ implicit request =>
+    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key)))
+  
+  }
 
   def show(id:String) = Action{ implicit request => 
 
     val userIsLoggedIn : Boolean = isLoggedIn(request)
     Logger.debug("user is logged in: " + userIsLoggedIn)
     
-    Ok(views.html.problems.show("username", Problem.findById(id.toLong), getUser(request)))
+    Ok(views.html.puzzles.show("username", Puzzle.findById(id.toLong), getUser(request)))
   }
 
   def solve() = Action { implicit request => 
@@ -113,7 +124,7 @@ object Problems extends Controller with Secured {
       }
       case List(Some(solution), Some(id)) => {
         //get the tagged solution so we can process the user solution if it contains ==
-        val taggedSolution : String = Problem.findById(id.toLong, false).body
+        val taggedSolution : String = Puzzle.findById(id.toLong, false).body
         
         def escape(t:Tuple2[String,String])(s:String) = s.replace(t._1, t._2)
         val escapeDoubleEq = escape(("==", "_!double_eq!_"))(_)
@@ -156,46 +167,60 @@ object Problems extends Controller with Secured {
 
    
   def solveAndSubmit() = Action { implicit request =>
+    val response = processSolution(extractParamsAndInsert)  
+    Ok( generate(response)).withHeaders(Json)
+  }
 
-    def getResponse() = {
-      getFormParameter( Params.SOLUTION )  match {
-        
-        case None => ResponseWithMessage(false, "No solution provided")
-        
-        case Some(solution) => {
-        
-          getFormParameter( Params.SOLUTION )  match {
-            case None => ResponseWithMessage(false, "No solution provided")
-            case Some(solution) => {
-              val result : EvaluationResult = PuzzleEvaluator.solve(solution)
-                
-              if( result.successful ){
-                solution match {
-                  case PuzzleRegex.ValidPuzzle(pre,puzzleSolution,post) => {
-
-                    getFormParameters( Params.NAME, Params.DESCRIPTION, Params.LEVEL, Params.CATEGORY) match {
-                   
-                      case List(Some(name), Some(description), Some(level), Some(category)) => {
-                        
-                        //TODO: fix puzzle insertion
-                        insertNewPuzzle(solution,name,description,level,category) 
-                        ResponseWithMessage(true,SUBMITTED)
-                      }
-                      case _ => ResponseWithMessage(false, MISSING_ALL_FORM_VARS)
-                    }
-                  }
-                  case _ => ResponseWithMessage(false, INVALID_SOLUTION_SYNTAX)
-                }
-
-              }else{
-                ResponseWithMessage(false, UNKNOWN_ERROR)
-              }
-            }
+  /**
+   * @param: validPuzzleHandler - the function to invoke of the solution is valid.
+   * @return: a ResponseWithMessage
+   */
+  private def processSolution( validPuzzleHandler : String => ResponseWithMessage )(implicit request : Request[AnyContent])= {
+    getFormParameter( Params.SOLUTION )  match {
+      
+      case None => ResponseWithMessage(false, "No solution provided")
+      
+      case Some(solution) => {
+      
+        val result : EvaluationResult = PuzzleEvaluator.solve(solution)
+          
+        if( result.successful ){
+          if( PuzzleRegex.isValid(solution)){
+            validPuzzleHandler(solution)
           }
+          else{
+            ResponseWithMessage(false, INVALID_SOLUTION_SYNTAX)
+          }
+        }else{
+          ResponseWithMessage(false, UNKNOWN_ERROR)
         }
       }
     }
-    Ok( generate(getResponse()) ).withHeaders(Json)
+  }
+
+  /**
+   * Extract the remaining parameters and insert into db.
+   */
+  private def extractParamsAndInsert(solution:String) (implicit request : Request[AnyContent] ) 
+    : ResponseWithMessage  = { 
+    getFormParameters( Params.NAME, Params.DESCRIPTION, Params.LEVEL, Params.CATEGORY) match {
+   
+      case List(Some(name), Some(description), Some(level), Some(category)) => {
+        
+        val resultTuple = insertNewPuzzle(solution,name,description,level,category) 
+        ResponseWithMessage(true,SUBMITTED, resultTuple._1)
+      }
+      case _ => ResponseWithMessage(false, MISSING_ALL_FORM_VARS)
+    }
+  }
+
+  /**
+   * only insert the puzzle - we don't have any user data
+   */
+  private def insertPuzzleOnly(solution:String)(implicit request : Request[AnyContent] ) 
+    : ResponseWithMessage = { 
+    val resultTuple = Puzzle.insert(PuzzleCaseClassHelper.anonymousPuzzle(solution))
+    ResponseWithMessage(true,SUBMITTED, resultTuple._1, resultTuple._2)
   }
 
   private def insertNewPuzzle(solution:String, name:String, description:String, level : String, category:String )(implicit request : Request[AnyContent] )  = {
@@ -203,9 +228,9 @@ object Problems extends Controller with Secured {
     val u : Option[User] = User.findByEmail(request.session.get("email").getOrElse("ed.eustace@gmail.com"))
     val email = u.getOrElse(User()).email
     
-    val newPuzzle =  NewProblem( name, description, solution, level, category, email)
+    val newPuzzle =  NewPuzzle( name, description, solution, level, category, email)
 
-    Problem.insert( newPuzzle )
+    Puzzle.insert( newPuzzle )
   }
 
 

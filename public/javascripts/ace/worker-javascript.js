@@ -2752,14 +2752,14 @@ define('ace/worker/jshint', ['require', 'exports', 'module' ], function(require,
 
  If it checks out, JSHINT returns true. Otherwise, it returns false.
 
- If false, you can inspect JSHINT.errors to find out the problems.
+ If false, you can inspect JSHINT.errors to find out the puzzles.
  JSHINT.errors is an array of objects containing these members:
 
  {
      line      : The line (relative to 0) at which the lint was found
      character : The character (relative to 0) at which the lint was found
-     reason    : The problem
-     evidence  : The text line in which the problem occurred
+     reason    : The puzzle
+     evidence  : The text line in which the puzzle occurred
      raw       : The raw message before the details were inserted
      a         : The first detail
      b         : The second detail
@@ -2772,7 +2772,7 @@ define('ace/worker/jshint', ['require', 'exports', 'module' ], function(require,
 
  You can request a Function Report, which shows all of the functions
  and the parameters and vars that they use. This can be used to find
- implied global variables and other problems. The report is in HTML and
+ implied global variables and other puzzles. The report is in HTML and
  can be inserted in an HTML <body>.
 
      var myReport = JSHINT.report(limited);
@@ -6506,7 +6506,7 @@ loop:   for (;;) {
                     c = data.errors[i];
                     if (c) {
                         e = c.evidence || '';
-                        o.push('<p>Problem' + (isFinite(c.line) ? ' at line ' +
+                        o.push('<p>Puzzle' + (isFinite(c.line) ? ' at line ' +
                                 c.line + ' character ' + c.character : '') +
                                 ': ' + c.reason.entityify() +
                                 '</p><p class=evidence>' +

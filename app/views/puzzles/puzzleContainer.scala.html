@@ -1,4 +1,4 @@
-@(problem:Problem, isSolved : Boolean)
+@(puzzle:Puzzle, isSolved : Boolean)
 
 @getIconClass(solved:Boolean) = @{
   solved match {
@@ -15,13 +15,13 @@
 }
 
 
-<div class="puzzle-container" id="_problem_@problem.id" data-problem-id="@problem.id">
+<div class="puzzle-container" id="_puzzle_@puzzle.id" data-puzzle-id="@puzzle.id">
   <table>
     <tr>
       <td width="20"><span class="@getIconColor(isSolved) puzzle-icon"><i class="@getIconClass(isSolved)"/></span></td>
       <td class="puzzle-title">
-        <a class="puzzle-link pull-left" href="javascript:void(1)">&nbsp;@problem.name</a>
-        <span class="pull-right label label-info">@problem.category</span>
+        <a class="puzzle-link pull-left" href="javascript:void(1)">&nbsp;@puzzle.name</a>
+        <span class="pull-right label label-info">@puzzle.category</span>
     </td>
   </tr>
   </table>

@@ -9,7 +9,7 @@ import anorm.SqlParser._
 import play.api.libs._
 
 
-case class UserSolution(id: Pk[Long], user_email:String, problem_id:Long, solution:String)
+case class UserSolution(id: Pk[Long], user_email:String, puzzle_id:Long, solution:String)
 
 object UserSolution{
   
@@ -17,9 +17,9 @@ object UserSolution{
     
     get[Pk[Long]]("user_solution.id") ~
     get[String]("user_solution.user_email") ~
-    get[Long]("user_solution.problem_id") ~
+    get[Long]("user_solution.puzzle_id") ~
     get[String]("user_solution.solution") map {
-      case id~user_email~problem_id~solution => UserSolution(id,user_email,problem_id,solution)
+      case id~user_email~puzzle_id~solution => UserSolution(id,user_email,puzzle_id,solution)
     }
   }
 
@@ -42,18 +42,18 @@ object UserSolution{
 
   }
 
-   def create(email:String, problemId:Long, solution:String): Boolean = {
+   def create(email:String, puzzleId:Long, solution:String): Boolean = {
     DB.withConnection { implicit connection =>
 
       val totalRows = SQL(
               """
                 select count(*) from user_solution 
                 where user_solution.user_email = {email}
-                and user_solution.problem_id = {problemId}
+                and user_solution.puzzle_id = {puzzleId}
               """
             ).on(
               'email -> email,
-              'problemId -> problemId
+              'puzzleId -> puzzleId
             ).as(scalar[Long].single)
 
       if( totalRows == 0 )
@@ -61,12 +61,12 @@ object UserSolution{
         SQL(
           """
             insert into user_solution
-            (user_email, problem_id, solution)
-            values ( {email}, {problemId}, {solution} )
+            (user_email, puzzle_id, solution)
+            values ( {email}, {puzzleId}, {solution} )
           """
         ).on(
           'email -> email,
-          'problemId -> problemId,
+          'puzzleId -> puzzleId,
           'solution -> solution
         ).executeUpdate()
       

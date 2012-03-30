@@ -1,0 +1,85 @@
+@(puzzleStart : String, puzzleEnd: String)
+
+@leftColumnContent = {}
+
+
+@postBodyScript = {
+<script type="text/javascript" src="@routes.Assets.at("javascripts/CreatePuzzleView.js")"></script>
+<script type="text/javascript">
+  
+  $(document).ready(function(){
+      
+      var editor = ace.edit("editor");
+      editor.setTheme("ace/theme/twilight");
+      editor.getSession().setTabSize(4);
+      editor.setHighlightActiveLine(true);
+      editor.setShowPrintMargin(false);
+      editor.renderer.setShowGutter(true);
+      var ScalaMode = ace.require("ace/mode/scala").Mode;
+      editor.getSession().setMode(new ScalaMode());
+      window.ace = (window.ace || {});
+      window.ace.editor = editor;
+
+      console.log("setting url to: /puzzles/solve")
+
+      var existingSolutions = {};
+
+      var view = new com.ee.CreatePuzzleView(
+          "/puzzles/solve",
+          "/puzzles/save", 
+          editor, 
+          editor.getSession().getValue(),
+          "@Html(puzzleStart)",
+          "@Html(puzzleEnd)");
+      
+      editor.commands.addCommand({
+          name: 'myCommand',
+          bindKey: {
+              win: 'Ctrl-R',
+              mac: 'Ctrl-R',
+              sender: 'editor'
+          },
+          exec: function(env, args, request) {
+            view.runCode();
+          }
+      });
+  });
+</script>
+
+
+}
+
+@mainContent = {
+
+<div class="editor-main-area">
+  <div class="padded-10 max-width run-bar">
+    <div>
+      <a href="javascript:void(1)" id="testButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test</a>
+      <a href="javascript:void(1)" id="testAndSubmitButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Save</a>
+        &nbsp;
+        <span class="title" id="main-puzzle-title">Create a Puzzle</span>
+        &nbsp;
+        -
+        <span class="subheader" id="main-puzzle-subheader">ooh!</span>
+    </div>
+    <div>
+    
+      
+  </div>
+
+  </div>
+
+ 
+  <pre id="editor" >/* write your code here [Ctrl-R runs it]*/</pre>
+
+  <div class="errorBoxHolder padded-10">
+    <div id="successBox" class="alert alert-success invisible"></div>
+    <div id="errorBox" class="alert alert-error invisible">
+    </div>
+  </div>  
+</div>
+}
+
+
+@main("Submit a Puzzle", null)(mainContent)(postBodyScript, leftColumnContent) 
+

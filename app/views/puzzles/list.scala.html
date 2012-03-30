@@ -1,11 +1,11 @@
-@(message : String, currentPage: Page[Problem], currentOrderBy: Int, currentFilter: String, user : User = null, solutions : Seq[UserSolution] = null	)(implicit flash: play.api.mvc.Flash)
+@(message : String, currentPage: Page[Puzzle], currentOrderBy: Int, currentFilter: String, user : User = null, solutions : Seq[UserSolution] = null	)(implicit flash: play.api.mvc.Flash)
 
 @****************************************
 * Helper generating navigation links    *
 ****************************************@
-@isSolved(problem: Problem, solutions : Seq[UserSolution]) = @{
-     val ids = solutions.map (  _.problem_id.toString )
-     if( ids.contains(problem.id.toString) ){
+@isSolved(puzzle: Puzzle, solutions : Seq[UserSolution]) = @{
+     val ids = solutions.map (  _.puzzle_id.toString )
+     if( ids.contains(puzzle.id.toString) ){
       true
      }else{
       false
@@ -14,22 +14,22 @@
 
 @writeSolutionsToJsObject(solutions:Seq[UserSolution]) = @{
   solutions.foreach( (s:UserSolution) => {
-    "solution['"+s.problem_id+"'] = " + s.solution
+    "solution['"+s.puzzle_id+"'] = " + s.solution
   })
 }
 
-@firstUnsolvedProblem() = @{
- Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
-    val unsolvedProblem = 
-        problems.find((p:Problem) => !isSolved(p, solutions))
-    unsolvedProblem match{
-      case None => problems.head.id
-      case p: Option[Problem] =>  p.get.id
+@firstUnsolvedPuzzle() = @{
+ Option(currentPage.items).filterNot(_.isEmpty).map { puzzles =>
+    val unsolvedPuzzle = 
+        puzzles.find((p:Puzzle) => !isSolved(p, solutions))
+    unsolvedPuzzle match{
+      case None => puzzles.head.id
+      case p: Option[Puzzle] =>  p.get.id
     }
    }.getOrElse(-1)
 }
 
-@countProblems() = @{
+@countPuzzles() = @{
   Option(currentPage.items.size).getOrElse("?")
 }
 
@@ -53,10 +53,10 @@
 </div>
 
 <div class="holder">
-  @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
-    @problems.map { 
-      case (problem) => {
-         @views.html.problems.puzzleContainer(problem, isSolved(problem, solutions))
+  @Option(currentPage.items).filterNot(_.isEmpty).map { puzzles =>
+    @puzzles.map { 
+      case (puzzle) => {
+         @views.html.puzzles.puzzleContainer(puzzle, isSolved(puzzle, solutions))
       }
     }
   }.getOrElse {)
@@ -70,7 +70,7 @@
 
 
 @postBodyScript = {
-<script type="text/javascript" src="@routes.Assets.at("javascripts/ProblemsView.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/PuzzlesView.js")"></script>
 <script type="text/javascript" src="/assets/javascripts/string-update-processor.js"></script>
 
 <script type="text/javascript">
@@ -88,27 +88,27 @@
       window.ace = (window.ace || {});
       window.ace.editor = editor;
 
-      console.log("setting url to: /problems/solve")
+      console.log("setting url to: /puzzles/solve")
 
       var existingSolutions = {};
 
       @solutions.map { s =>
-      existingSolutions["@s.problem_id"] = "@htmlSafe(s.solution)";
+      existingSolutions["@s.puzzle_id"] = "@htmlSafe(s.solution)";
       } 
       
-      var problems = [];
+      var puzzles = [];
 
-      @Option(currentPage.items).filterNot(_.isEmpty).map { problems =>
-        @problems.map { 
-          case (problem) => {
+      @Option(currentPage.items).filterNot(_.isEmpty).map { puzzles =>
+        @puzzles.map { 
+          case (puzzle) => {
             
-            var problemData =  { 
-                id: @problem.id,
-                code: "@htmlSafe(problem.body)", 
-                title: "@problem.name",
-                description: "@problem.description",
-                user: "@problem.user_name" }
-            problems.push(problemData)
+            var puzzleData =  { 
+                id: @puzzle.id,
+                code: "@htmlSafe(puzzle.body)", 
+                title: "@puzzle.name",
+                description: "@puzzle.description",
+                user: "@puzzle.user_name" }
+            puzzles.push(puzzleData)
           }
        }
       }.getOrElse {
@@ -116,16 +116,16 @@
       
       @writeSolutionsToJsObject(solutions)
 
-      var view = new com.ee.ProblemsView("/problems/solve", 
+      var view = new com.ee.PuzzlesView("/puzzles/solve", 
             editor,
-            problems, 
+            puzzles, 
             existingSolutions
             );
 
       var solvedSoFar = @countSolutions()
-      var totalProblems = @countProblems()
-      var firstUnsolvedId = @firstUnsolvedProblem();
-      view.init(firstUnsolvedId, solvedSoFar, totalProblems);
+      var totalPuzzles = @countPuzzles()
+      var firstUnsolvedId = @firstUnsolvedPuzzle();
+      view.init(firstUnsolvedId, solvedSoFar, totalPuzzles);
       
       editor.commands.addCommand({
           name: 'myCommand',
