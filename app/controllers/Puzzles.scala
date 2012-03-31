@@ -116,34 +116,31 @@ object Puzzles extends Controller with Secured {
     Ok(generate(response)).withHeaders(Json)
   }
   
+
+  /**
+   * Solve a supplied solution
+   * @param solution the puzzle solution
+   */
   def solve() = Action { implicit request => 
 
     getFormParameters( Params.SOLUTION, Params.ID )  match {
       case List(None,None) => Ok( generate( ResponseWithMessage(false, "No solution provided")) )
-      //TODO: Allow a solution with no id to be solved for the moment, but will need to remove this.
       case List(Some(solution), None) => {
+
+        //Note: we don't pre or post process the solution as we have no reference to compare it with.
         val evaluationResponse : EvaluationResult = PuzzleEvaluator.solve(solution)
         val output = ResponseWithResults(evaluationResponse.successful, evaluationResponse)
         val generated = generate(output)
         Ok(generate(output)).withHeaders(Json)
       }
       case List(Some(solution), Some(id)) => {
-        //get the tagged solution so we can process the user solution if it contains ==
-        val taggedSolution : String = Puzzle.findById(id.toLong, false).body
         
-        def escape(t:Tuple2[String,String])(s:String) = s.replace(t._1, t._2)
-        val escapeDoubleEq = escape(("==", "_!double_eq!_"))(_)
-        val unEscapeDoubleEq = escape(("_!double_eq!_", "=="))(_)
+        val preAndPostProcessTuple = getPreAndPostPreprocessFn(id.toLong)
 
-        def preProcess(template:String)(solution:String) : String 
-          = TaggedStringProcessor.process(solution, template, escapeDoubleEq, "/*<*/", "/*>*/" )
-        
-        val escapeDoubleEqWithinTags = preProcess(taggedSolution)(_)
-        
         val evaluationResponse : EvaluationResult 
           = PuzzleEvaluator.solve(solution, 
-                Option(escapeDoubleEqWithinTags), 
-                Option(unEscapeDoubleEq))
+                Option(preAndPostProcessTuple._1), 
+                Option(preAndPostProcessTuple._2))
 
         if(evaluationResponse.successful){
           storeSolutionIfLoggedIn(solution)
@@ -155,6 +152,46 @@ object Puzzles extends Controller with Secured {
       }
       case _ => Ok(generate(ResponseWithMessage(false, "Unknown Error")))
     }
+  }
+
+  
+  /**
+   * The PuzzleEvaluator accepts a pre and post string processor function.
+   * These functions manipulate the string before and after it is evaluated.
+   * In this instance we remove '==' within the user solution if they've been added by the user.
+   * If they are part of the original solution they are maintained as this is how the evaluations 
+   * are done.
+   * @param id the id of the Puzzle in the db. 
+   * @return a Tuple2 of the pre and post processing functions
+   */
+  private def getPreAndPostPreprocessFn(id:Long) : Tuple2[String => String, String => String] = {
+
+        val taggedSolution : String = Puzzle.findById(id, false).body
+        
+        /**
+         * replace first item in tuple with second item
+         * @param token to escape
+         * @param replacement
+         * @param isEscape - if true will swap replacement for token otherwise it'll do the opposite.
+         * @param s - the string to act on
+         * @return the manipulated string
+         */
+        def escape(first:String,second:String)(isEscape:Boolean)(s:String) = {
+          val searchItem =  if( isEscape ) first else second 
+          val replacement = if( isEscape ) second else first 
+          s.replace(searchItem, replacement)
+        }
+        
+        val changeEquals = escape("==", "_!double_eq!_")(_)
+        val escapeEquals = changeEquals(true)(_)
+        val unEscapeEquals = changeEquals(false)(_)
+
+
+        def preProcessFn(template:String)(solution:String) : String = {
+           TaggedStringProcessor.process(solution, template, escapeEquals, "/*<*/", "/*>*/" )
+        }
+
+        (preProcessFn(taggedSolution)(_), unEscapeEquals)
   }
 
   /**

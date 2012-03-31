@@ -9,7 +9,7 @@ object TaggedStringProcessor {
   
   /**
    * processes a part of a string with the provided action,
-   * the part that is processed will bet marked in the normalisedTemplate as being between the openTag and closeTag 
+   * the part that is processed will be marked in the normalisedTemplate as being between the openTag and closeTag 
    *
    * so: 
    * "hello there harry", "hello <> harry", (_.replace('e', 'a')), "<", ">" will return

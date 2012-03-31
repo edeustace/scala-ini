@@ -106,7 +106,7 @@ object Application extends Controller {
     import routes.javascript._
     Ok(
       Routes.javascriptRouter("jsRoutes")(
-        Puzzles.index, Puzzles.show, Puzzles.testAuthentication
+        Puzzles.index, Puzzles.show 
       )
     ).as("text/javascript") 
   }
