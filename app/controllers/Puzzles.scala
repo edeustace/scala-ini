@@ -48,12 +48,17 @@ object Puzzles extends Controller with Secured {
     val CATEGORY = "category"
   }
 
-  
+  /**
+   * pages
+   */
   def createPuzzlePage = BrowserRestrict{ Action{
       Ok(views.html.puzzles.createPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
   }}
   
   
+  /**
+   * @deprecated('submit will be gone once the save mechanism is in place')
+   */
   def submitPuzzlePage = IsAuthenticated { username => _ =>
     User.findByEmail(username).map{ user => 
       Ok(views.html.puzzles.submitPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
@@ -61,22 +66,25 @@ object Puzzles extends Controller with Secured {
   }
   
   /**
-   * test authentication.
+   * Show a puzzle by the public url key
    */
-  def testAuthentication = IsAuthenticated { username => _ =>
-    User.findByEmail(username).map { user =>
-      Ok("authenticated")
-    }.getOrElse(Forbidden)
+  def showByUrlKey(key:String) = Action{ implicit request =>
+    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key)))
   }
- 
-  def save = Action{ implicit request => 
-    Logger.debug("save puzzle")
-    val response = processSolution(insertPuzzleOnly)  
-    Ok(generate(response)).withHeaders(Json)
+
+
+  /**
+   * @deprecated
+   * Show a puzzle by puzzle id
+   */
+  def show(id:String) = Action{ implicit request => 
+    val userIsLoggedIn : Boolean = isLoggedIn(request)
+    Logger.debug("user is logged in: " + userIsLoggedIn)
+    Ok(views.html.puzzles.show("username", Puzzle.findById(id.toLong), getUser(request)))
   }
 
   /**
-   * Display the paginated list of computers.
+   * Display the paginated list of puzzles.
    *
    * @param page Current page number (starts from 0)
    * @param orderBy Column to be sorted
@@ -98,19 +106,16 @@ object Puzzles extends Controller with Secured {
     }
   }
 
-  def showByUrlKey(key:String) = Action{ implicit request =>
-    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key)))
+
   
+  /**
+   * Save a puzzle, anonymous users can save puzzles and they'll get a url key that they can then link to.
+   */
+  def save = Action{ implicit request => 
+    val response = processSolution(insertPuzzleOnly)  
+    Ok(generate(response)).withHeaders(Json)
   }
-
-  def show(id:String) = Action{ implicit request => 
-
-    val userIsLoggedIn : Boolean = isLoggedIn(request)
-    Logger.debug("user is logged in: " + userIsLoggedIn)
-    
-    Ok(views.html.puzzles.show("username", Puzzle.findById(id.toLong), getUser(request)))
-  }
-
+  
   def solve() = Action { implicit request => 
 
     getFormParameters( Params.SOLUTION, Params.ID )  match {
