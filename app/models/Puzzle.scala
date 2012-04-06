@@ -173,7 +173,7 @@ object Puzzle {
           select * from puzzle as puzzle 
               inner JOIN app_user as app_user
               on app_user.email = puzzle.user_email
-          where puzzle.name like {filter}
+          where puzzle.name like {filter} and puzzle.is_on_curriculum = true
           order by 1
           limit {pageSize} offset {offset}
         """

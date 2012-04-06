@@ -69,7 +69,9 @@ object Puzzles extends Controller with Secured {
    * Show a puzzle by the public url key
    */
   def showByUrlKey(key:String) = Action{ implicit request =>
-    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key)))
+
+    val puzzleUrl = "http://" + request.host + request.uri
+    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key), puzzleUrl) )
   }
 
 
@@ -225,7 +227,7 @@ object Puzzles extends Controller with Secured {
       case Some(solution) => {
       
         val result : EvaluationResult = PuzzleEvaluator.solve(solution)
-          
+        println("processSolution - is successful? " + result.successful) 
         if( result.successful ){
           if( PuzzleRegex.isValid(solution)){
             validPuzzleHandler(solution)

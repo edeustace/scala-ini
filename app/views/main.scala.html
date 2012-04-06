@@ -1,12 +1,13 @@
 @(title: String, user : User = null)(content: Html)(implicit postBodyScripts:Html = new Html(""), leftColumnContent: Html = new Html(""))
 
-<!DOCTYPE html>
+@head = {
+<head>
+  <title>@title</title>
+  @common.head()
+</head>
+}
 
-<html>
-    <head>
-      <title>@title</title>
-       @common.head()
-      </head>
+@bodyContent = {
       <body>
         @common.githubRibbon()
       <div class="navbar-fixed-top">
@@ -32,5 +33,10 @@
 			      @content
          </div>
        </body>
-       @postBodyScripts
-</html>
+}
+
+@postBodyContent = {
+      @postBodyScripts
+}
+
+@base(title)(bodyContent, postBodyContent)

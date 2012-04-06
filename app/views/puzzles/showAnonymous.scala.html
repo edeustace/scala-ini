@@ -1,4 +1,4 @@
-@(puzzle : Puzzle)(implicit flash: play.api.mvc.Flash) 
+@(puzzle : Puzzle, url : String)(implicit flash: play.api.mvc.Flash) 
 
 @htmlSafe(s:String) = @{
   var out = s.replace("\\", "\\\\")
@@ -8,12 +8,12 @@
 }
 
 
-
-@leftColumnContent = {}
-
-
 @postBodyScript = {
-<script type="text/javascript" src="@routes.Assets.at("javascripts/CreatePuzzleView.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/LoadingButton.js")"></script>
+<script type="text/javascript" src="/assets/javascripts/string-update-processor.js"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/InfoBox.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/EvaluationHighlighter.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/SinglePuzzleView.js")"></script>
 <script type="text/javascript">
   
   $(document).ready(function(){
@@ -31,19 +31,8 @@
       editor.getSession().setValue( "@htmlSafe(puzzle.body)" );
       console.log("setting url to: /puzzles/solve")
 
-      /*
-      TODO: rejig the js
-      Base Puzzle Handler - send solution parse response
-      Then additional behaviour for the different pages.
-      so for this page - if solution is successful - save option + facebook option too.
-      */
-      /*var existingSolutions = {};
-
-      var view = new com.ee.CreatePuzzleView(
-          "/puzzles/solve",
-          "/puzzles/save", 
-          editor, 
-          editor.getSession().getValue(),
+      var view = new com.ee.SinglePuzzleView( "/puzzles/solve", editor) 
+      view.setPuzzle( "@htmlSafe(puzzle.body)" )
       
       editor.commands.addCommand({
           name: 'myCommand',
@@ -55,7 +44,7 @@
           exec: function(env, args, request) {
             view.runCode();
           }
-      });*/
+      });
   });
 </script>
 }
@@ -66,20 +55,39 @@
 <div class="editor-main-area">
   <div class="padded-10 max-width run-bar">
     <div>
-      <a href="javascript:void(1)" id="testButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test</a>
-      <a href="javascript:void(1)" id="testAndSubmitButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Save</a>
-        &nbsp;
-        <span class="title" id="main-puzzle-title">Create a Puzzle</span>
-        &nbsp;
-        -
-        <span class="subheader" id="main-puzzle-subheader">ooh!</span>
+      <a 
+        href="javascript:void(1)" 
+        id="runButton" 
+        class="btn btn-primary btn-large">
+          <i class="icon-refresh"></i> Run
+      </a>
+      &nbsp;
+      <span 
+        class="title" 
+        id="main-puzzle-title">Solve me!</span>
+      &nbsp;
+      -
+      <span class="subheader" id="main-puzzle-subheader"></span>
+      <!-- facebook --> 
+      <div 
+        class="fb-like" 
+        data-href="@url" 
+        data-send="true" 
+        data-width="450" 
+        data-show-faces="false" 
+        data-font="arial"></div>
+
+        <!-- twitter -->
+        <a href="https://twitter.com/share" 
+            class="twitter-share-button" 
+            data-count="none" 
+            data-hashtags="scalapuzzles">Tweet</a>
+        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+
     </div>
     <div>
-    
-      
   </div>
-
-  </div>
+</div>
 
  
   <pre id="editor" >/* write your code here [Ctrl-R runs it]*/</pre>
@@ -92,5 +100,5 @@
 </div>
 }
 
-@main("Solve me...", null)(mainContent)(postBodyScript, leftColumnContent)
+@base("Solve me...", null)(mainContent, postBodyScript)
 

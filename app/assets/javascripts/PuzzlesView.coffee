@@ -1,57 +1,30 @@
 window.com = (window.com || {})
 com.ee = (com.ee || {})
 
-class @com.ee.RunButton 
-  constructor: (@id, @clickHandler) ->
-    $(@id).click (e) => 
-      return if $(@id).hasClass("disabled")
-      @clickHandler e
-  
-  loading: (isLoading) ->
-    if isLoading
-      $(@id)
-        .addClass("disabled")
-        .find("i")
-        .removeClass("icon-play")
-        .addClass("icon-cog")
-    else
-      $(@id)
-        .removeClass("disabled")
-        .find("i")
-        .removeClass("icon-cog")
-        .addClass("icon-play")
-    null      
-
-
 class @com.ee.PuzzlesView
 
   ###
-  #
-  # @param solveUrl - the url to post solutions to
-  # @param editor - the ACE editor
-  # @param defaultEditorText - the default text in the editor what we can delete/restore
-  # @param existingSolutions - an object of existing solutions what we can put into the editor, 
-  # should the user choose that link.
-  #
-  # 
-  # <span>Solved: @countSolutions() of @countPuzzles()</span>
+  @param solveUrl - the url to post solutions to
+  @param editor - the ACE editor
+  @param defaultEditorText - the default text in the editor what we can delete/restore
+  @param existingSolutions - an object of existing solutions what we can put into the editor, 
+  should the user choose that link.
   ###
   constructor: (@solveUrl, @editor, @puzzles,  @existingSolutions)->
     console.log "PuzzlesView constructor solveUrl: #{@solveUrl}"
-    @processor = new com.ee.string.StringUpdateProcessor()
-    @hook = new com.ee.string.AceEditorHook @editor, @processor
-    @runButton = new com.ee.RunButton("#runButton", (e) => @onRunButtonClick e)
     null
 
   ###
-  # @param puzzleId - the first puzzle to open
-  # @parm solvedSoFar - the number of puzzles solved so far
-  # @param totalPuzzles - the total number of puzzles
+  @param puzzleId - the first puzzle to open
+  @parm solvedSoFar - the number of puzzles solved so far
+  @param totalPuzzles - the total number of puzzles
   ###
   init: (puzzleId, @solvedSoFar, @totalPuzzles )->
     @puzzleId = puzzleId
-    console.log "init with id: #{@puzzleId}"
-    @bindListenersToEditor()
+
+    @puzzleView = new com.ee.SinglePuzzleView @solveUrl, @editor
+    @puzzleView.addSuccessCallback => @onPuzzleSolved()
+
     @initPuzzleLinks()
     @initPreviousNextButtons()
     @moveToPuzzle @puzzleId
@@ -59,99 +32,18 @@ class @com.ee.PuzzlesView
     null
 
   ###
-  # Run the typed code against the server
+  callback handler if the puzzle has been solved.
   ###
-  runCode: ->
-    @runButton.loading true
-
-    params = 
-      id: @puzzleId, 
-      solution: window.ace.editor.getSession().getValue()
+  onPuzzleSolved: ->
+    @markTestSuccessful()
+    @storeSolution @editor.getSession().getValue()
+    @updateSolvedInfo 1
     
-    $.post( @solveUrl, 
-        params,
-        (data, textStatus,jqXHR) => @handleRunResponse data
-      )
+    setTimeout( => @moveToNextPuzzle()
+    1000)
     null
 
-  handleRunResponse: (data) ->
-    @runButton.loading false
-
-    console.log data
-    
-    if data.successful == true 
-      console.log "success"
-      @markTestSuccessful()
-      @storeSolution @editor.getSession().getValue()
-
-      setTimeout( => 
-        @clearEvaluations()
-        @moveToNextPuzzle()
-      , 1000 )
-      
-      @updateSolvedInfo 1
-    else 
-      console.log "failure: #{data.result.summary}"
-      $("#errorBox")
-        .html("Error: #{data.result.summary}")
-        .removeClass('invisible')
-
-    if data.result.evaluations?
-      @showEvaluationsInEditor(data.result.evaluations) 
-    null
-
-
-  clearEvaluations: ->
-    if @lastEvaluations?
-      for oldEvalution in @lastEvaluations
-        type = @_type oldEvalution.successful 
-        @editor.renderer.removeGutterDecoration oldEvalution.line, type 
-    null
-
-  showEvaluationsInEditor: (evaluations) ->
-    @clearEvaluations()
-    annotations = []
-
-    for evaluation in evaluations
-      type =  @_type evaluation.successful 
-      @editor.renderer.addGutterDecoration evaluation.line, type
-
-    @lastEvaluations = evaluations
-    null
-
-  _type: (successful) ->
-      if successful then "passed" else "failed"
-
-  bindListenersToEditor: ->
-    @editor.getSession().on 'change', (e) => @onEditorChange e
-    @editor.getSession().selection.on 'changeSelection', (e) => @onEditorChangeSelection e
-    @editor.getSession().selection.on 'changeCursor', (e) => @onEditorCursorChange e
-    null
-  
-
-  onEditorChangeSelection: (e) ->
-    @removeErrorBox()
-    null
-
-  onEditorChange: (e) ->
-    @removeErrorBox()
-    null
-
-  onEditorCursorChange: (e) ->
-    if @editor.getSession().getValue() == @defaultEditorText && !@isResetting
-      @editor.getSession().setValue ''
-    null
-
-
-  removeErrorBox: ->
-    $("#errorBox")
-      .addClass("invisible")
-    null
-  
-  onRunButtonClick: (e) ->
-    console.log "onRunButtonClick"
-    @runCode()
-    null
+  runCode: -> @puzzleView.runCode() if @puzzleView?
 
   initPuzzleLinks: ->
     $(".puzzle-link").click (e) => @onPuzzleLinkClick e
@@ -178,17 +70,17 @@ class @com.ee.PuzzlesView
     null
 
   moveToPuzzle: (newPuzzleId) ->
-
-    @clearEvaluations()
+  
     @puzzleId = newPuzzleId
     puzzle = @_getPuzzleForPuzzleId() 
-    $("#main-puzzle-title").html(puzzle.title)
 
+    $("#main-puzzle-title").html(puzzle.title)
     subheader = "#{puzzle.description} by #{puzzle.user}"
     $("#main-puzzle-subheader").html(subheader)
 
     $(".puzzle-container").removeClass("selected")
     $("#_puzzle_#{@puzzleId}").addClass("selected")
+
     @updateEditor()
     null
 
@@ -198,16 +90,14 @@ class @com.ee.PuzzlesView
   
 
   updateEditor: ->
-    puzzle = @_getPuzzleForPuzzleId @puzzleId
-    code = puzzle.code
-
-    if @processor?
-      @processor.init code
         
     if @existingSolutions[@puzzleId]?
       @editor.getSession().setValue @existingSolutions[@puzzleId]
     else
-      @editor.getSession().setValue code 
+      puzzle = @_getPuzzleForPuzzleId @puzzleId
+      @editor.getSession().setValue puzzle.code
+
+    @puzzleView.setPuzzle @editor.getSession().getValue()
     null
 
   initPreviousNextButtons: ->
@@ -232,17 +122,9 @@ class @com.ee.PuzzlesView
     null
 
 
-  moveToNextPuzzle: ->
-    @_onPrevNextClick 1
-    null
-  
-  onPrevClick: (e) ->
-    @_onPrevNextClick -1
-    null
-
-  onNextClick: (e) ->
-    @_onPrevNextClick 1
-    null
+  moveToNextPuzzle: -> @_onPrevNextClick 1
+  onPrevClick: (e) -> @_onPrevNextClick -1
+  onNextClick: (e) -> @_onPrevNextClick 1
 
   _onPrevNextClick: (increment) ->
     nextId = @getNextId increment

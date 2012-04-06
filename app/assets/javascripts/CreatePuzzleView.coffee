@@ -11,28 +11,20 @@ class @com.ee.CreatePuzzleView
   ###
   constructor: (@solveUrl, @saveUrl, @editor, @defaultEditorText, @puzzleStart = "/*<<*/", @puzzleEnd = "/*>>*/" )->
     console.log "CreatePuzzleView constructor solveUrl: #{@solveUrl}"
-    @bindListenerToTestButton()
-    @bindListenerToTestAndSubmitButton()
+    @testButton = new com.ee.LoadingButton("#testButton", (e) => @onTestButtonClick e)
+    @saveButton = new com.ee.LoadingButton("#saveButton", (e) => @onSaveButtonClick e)
+    @evalHighlighter = new com.ee.EvaluationHighlighter(@editor)
     @bindListenersToEditor()
-    null
-
-
-  bindListenerToTestButton: ->
-    $("#testButton").click( (e) => @onTestButtonClick e)
     null
 
   onTestButtonClick: (e) ->
     console.log "onTestButtonClick"
+    @testButton.loading true
     @runCode()
     null
 
-  
-  bindListenerToTestAndSubmitButton: ->
-    $("#testAndSubmitButton").click( (e) => @onTestAndSubmitButtonClick e)
-    null
-
-  onTestAndSubmitButtonClick: (e) ->
-    console.log "onTestAndSubmitButtonClick"
+  onSaveButtonClick: (e) ->
+    console.log "onSaveButtonClick"
     @saveCode()
     null
 
@@ -42,6 +34,25 @@ class @com.ee.CreatePuzzleView
     @editor.getSession().selection.on 'changeCursor', (e) => @onEditorCursorChange e
     null
 
+  onEditorChange: (e) ->
+    @removeErrorBox()
+    @removeSuccessBox()
+    null
+
+  removeErrorBox: -> 
+    @_removeBox("#errorBox")
+
+  onEditorCursorChange: (e) ->
+    if @editor.getSession().getValue() == @defaultEditorText && !@isResetting
+      @editor.getSession().setValue ''
+    null
+
+  removeSuccessBox: ->
+    @_removeBox("#successBox") 
+
+  _removeBox: (id)->  
+    $(id).addClass 'invisible' 
+
   ###
   # Run the typed code against the server
   ###
@@ -50,65 +61,51 @@ class @com.ee.CreatePuzzleView
     params = 
       solution: @editor.getSession().getValue()
 
-    @_invoke @solveUrl, params
+    @_invoke @solveUrl, params, @onTestResponse
     null
- 
+
+
+  onTestResponse: (data) ->
+    @testButton.loading false
+
+    console.log data
+    
+    if data.successful == true 
+      console.log "success"
+      @evalHighlighter.clear()
+    else 
+      console.log "failure: #{data.result.summary}"
+      $("#errorBox")
+        .html("Error: #{data.result.summary}")
+        .removeClass('invisible')
+
+    if data.result.evaluations?
+      @evalHighlighter.show(data.result.evaluations) 
+    null
+
+  ###
+  # Save the code on the server
+  ###   
   saveCode: ->
       params = 
         solution: @editor.getSession().getValue()
-      @_invoke @saveUrl, params
+      @_invoke @saveUrl, params, @onSaveResponse
     null
 
-  _invoke: (url, params) ->
+  _invoke: (url, params, callback) ->
     $.post( url, 
         params,
-        (data, textStatus,jqXHR) => @onSaveResponse data
+        (data, textStatus,jqXHR) => callback.call this, data
       )
     null
 
-  
-     
-  getInvalidItems: ->
-    out = []
-
-    out.push( "#nameInput") if $("#nameInput").val() == ""
-    out.push "#descriptionInput" if $("#descriptionInput").val() == ""
-
-    out
-
-  highlightInvalidItems: (invalidItems) ->
-    for id in invalidItems
-      $(id).closest(".control-group").addClass("error")
-
-    null
-
-  onEditorChange: (e) ->
-    @removeErrorBox()
-    @removeSuccessBox()
-    null
-
-  onEditorCursorChange: (e) ->
-    if @editor.getSession().getValue() == @defaultEditorText && !@isResetting
-      @editor.getSession().setValue "#{@puzzleStart} #{@puzzleEnd}"
-    null
-
-  removeErrorBox: -> 
-    @_removeBox("#errorBox")
-
-  removeSuccessBox: ->
-    @_removeBox("#successBox") 
-
-  _removeBox: (id)->  
-    $(id).addClass 'invisible' 
-
- 
   onSaveResponse: (data) ->
     if data.successful == true
       console.log "urlKey: #{data.urlKey}"
       document.location.href = "/puzzles/key/#{data.urlKey}"
     else
       $("#errorBox")
-        .html("Error: couldn't save")
+        .html(data.message)
         .removeClass('invisible')
     null
  

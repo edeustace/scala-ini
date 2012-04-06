@@ -7,7 +7,7 @@ insert into app_user (email,name,password)
 insert into app_user (email,name,password) 
   values ('edeustace@yahoo.com','ed eustace','password');
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
 	values ('The basics','Some simple tests to get you started','//booleans
 true == /*<*/true/*>*/
 false == /*<*/false/*>*/
@@ -18,10 +18,10 @@ false == /*<*/false/*>*/
 (1 + 2) * 3 == /*<*/9/*>*/
 6 / 2 - 1 == /*<*/2/*>*/
 6 / (2 - 1) == /*<*/6/*>*/',
-'easy', 'basics', 'ed.eustace@gmail.com');
+'easy', 'basics', 'ed.eustace@gmail.com', true);
 
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('String','Some basic string manipulations',
 '"hello world" .toUpperCase == /*<*/"HELLO WORLD"/*>*/
 
@@ -38,9 +38,9 @@ def capitalize(s: String) = {
 
 capitalize("man OF stEEL") == "Man Of Steel"'
 ,
-'easy', 'string', 'ed.eustace@gmail.com');
+'easy', 'string', 'ed.eustace@gmail.com', true);
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('Functions','Some basic functions',
 '//def defines a function
 def addOne(m: Int): Int = m + 1
@@ -62,9 +62,9 @@ def three() = 1 + 2
 
 three == /*<*/3/*>*/'
 ,
-'easy', 'functions', 'ed.eustace@gmail.com');
+'easy', 'functions', 'ed.eustace@gmail.com', true);
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('Anonymous Functions','Some anonymous functions',
 '/*inspired by http://twitter.github.com/scala_school/basics.html */
 //we can assign an anonymous function to a val
@@ -83,9 +83,9 @@ addOne(2) == /*<*/3/*>*/
 
 '
 ,
-'easy', 'functions', 'ed.eustace@gmail.com');
+'easy', 'functions', 'ed.eustace@gmail.com', true);
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('Partial application of functions','Some examples of partially applied functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 //You can partially apply a function with an underscore, which gives you another function.
@@ -101,9 +101,9 @@ add3(1) == 4
 add3(2) == 5
 '
 ,
-'easy', 'functions', 'ed.eustace@gmail.com');
+'easy', 'functions', 'ed.eustace@gmail.com', true);
 
-insert into puzzle (name,description,body,level,category,user_email) 
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('Curried functions','Some examples of curried functions',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 def multiply(m: Int)(n: Int): Int = m * n
@@ -125,9 +125,9 @@ val adderCurried = (adder(_,_))/*<*/.curried/*>*/
 adderCurried(1)(2) == 3
 '
 ,
-'easy', 'functions', 'ed.eustace@gmail.com');
+'easy', 'functions', 'ed.eustace@gmail.com', true);
 
-  insert into puzzle (name,description,body,level,category,user_email) 
+  insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
   values ('Traits','Simple traits',
 '/* inspired by http://twitter.github.com/scala_school/basics.html */
 trait And {
@@ -152,9 +152,9 @@ val birds = new Birds()
 birds.and == "bees"
 '
 ,
-'easy', 'traits', 'ed.eustace@gmail.com');
+'easy', 'traits', 'ed.eustace@gmail.com', true);
 
-insert into puzzle (name,description,body,level,category,user_email)
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values ('Interleave', 'Write a function called "interleave" that interleaves 2 lists', 
     'def interleave( a: List[Any], b: List[Any] ) : List[Any] = {
     /*<*/
@@ -177,9 +177,9 @@ resultOne == expectedOne
 
 val resultTwo = interleave(List(1,2,3,4,5), List("a","b"))
 val expectedTwo = List(1,"a",2,"b")
-resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
+resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com', true);
 
-  insert into puzzle (name,description,body,level,category,user_email)
+  insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values ('Lists', 'Some simple list puzzles', 
     '
     val myList = List(1,2,3,4,5,6)
@@ -188,10 +188,10 @@ resultTwo == expectedTwo', 'simple', 'functions', 'ed.eustace@gmail.com');
     myList.head == /*<*/1/*>*/
     myList.last == /*<*/11/*>*/
     myList.drop(4) == /*<*/List(5,6)/*>*/
-    ', 'simple', 'functions', 'ed.eustace@gmail.com');
+    ', 'simple', 'functions', 'ed.eustace@gmail.com', true);
 
 
-  insert into puzzle (name,description,body,level,category,user_email)
+  insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values ('Pattern matching', 'Simple pattern matching', 
     'def numberAsWord(i:Int) : String = i match {
   case 1 => "one"
@@ -215,10 +215,10 @@ def wordAsNumber(s:String) : Int = s match {
 wordAsNumber("one") == 1
 wordAsNumber("two") == 2
 wordAsNumber("blah") == -1 
-    ', 'simple', 'functions', 'ed.eustace@gmail.com');
+    ', 'simple', 'functions', 'ed.eustace@gmail.com', true);
 
 
-   insert into puzzle (name,description,body,level,category,user_email)
+   insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values ('Palindrome detector', 'Write a function that finds palindromes', 
     '/*Inspired by: http://www.4clojure.com/problem/27 */
 def isPalindrome( l : List[Any] ) : Boolean = l match {
@@ -239,9 +239,9 @@ isPalindrome(List(1,2,3) ) == false
 isPalindrome(List(1,2,2,1) ) == true
 isPalindrome(List("a", "b", "b", "a")) == true
 isPalindrome(List("c", "a", "r")) == false
-    ', 'simple', 'functions', 'ed.eustace@gmail.com');
+    ', 'simple', 'functions', 'ed.eustace@gmail.com', true);
 
-   insert into puzzle (name,description,body,level,category,user_email)
+   insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values ('Drop Every Nth Item', 'Write two functions, one that drops every nth item and one that keeps them', 
     '/* inspired by: http://www.4clojure.com/problem/41 */
 
@@ -282,12 +282,12 @@ keepEveryNth( List(1,2,3,4,5), 2) == List(2,4)
 
 dropEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(1,2,4,5,7,8)
 keepEveryNth( List(1,2,3,4,5,6,7,8), 3) == List(3,6)
-', 'simple', 'functions', 'ed.eustace@gmail.com');
+', 'simple', 'functions', 'ed.eustace@gmail.com', true);
 
 
 
 
-insert into puzzle (name,description,body,level,category,user_email)
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum)
   values('Update one node but not another', 'Write a function "updateVersion" that updates a version node if it is within a "subnode" node.',
 '
 import scala.xml._
@@ -322,7 +322,7 @@ val updatedXml : Node = updateVersion(InputXml)
 ',
 'easy', 
 'function', 
-'ed.eustace@gmail.com');
+'ed.eustace@gmail.com', true);
 
 
 
@@ -354,6 +354,7 @@ def capitalize(s: String) = {
 capitalize("mAn OF STeeL") == "Man Of Steel"');
 
 # --- !Downs
+delete from puzzle_url_key;
 delete from puzzle;
 delete from user_solution;
 delete from user;

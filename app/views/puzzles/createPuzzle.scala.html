@@ -1,9 +1,9 @@
 @(puzzleStart : String, puzzleEnd: String)
 
-@leftColumnContent = {}
 
-
-@postBodyScript = {
+@postBodyContent = {
+<script type="text/javascript" src="@routes.Assets.at("javascripts/LoadingButton.js")"></script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/EvaluationHighlighter.js")"></script>
 <script type="text/javascript" src="@routes.Assets.at("javascripts/CreatePuzzleView.js")"></script>
 <script type="text/javascript">
   
@@ -45,8 +45,6 @@
       });
   });
 </script>
-
-
 }
 
 @mainContent = {
@@ -55,7 +53,7 @@
   <div class="padded-10 max-width run-bar">
     <div>
       <a href="javascript:void(1)" id="testButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test</a>
-      <a href="javascript:void(1)" id="testAndSubmitButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Save</a>
+      <a href="javascript:void(1)" id="saveButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Save</a>
         &nbsp;
         <span class="title" id="main-puzzle-title">Create a Puzzle</span>
         &nbsp;
@@ -81,5 +79,5 @@
 }
 
 
-@main("Submit a Puzzle", null)(mainContent)(postBodyScript, leftColumnContent) 
+@base("Create your own puzzle", null)(mainContent, postBodyContent) 
 

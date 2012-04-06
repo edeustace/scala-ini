@@ -17,6 +17,7 @@ create table puzzle (
   level                   varchar(255) not null,
   category                varchar(255) not null,
   user_email              varchar(255) not null,
+  is_on_curriculum        boolean not null default false,
   foreign key(user_email) references app_user (email) on delete cascade,
   constraint pk_puzzle   primary key (id));
 
