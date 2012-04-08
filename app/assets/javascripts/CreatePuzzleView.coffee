@@ -17,17 +17,6 @@ class @com.ee.CreatePuzzleView
     @bindListenersToEditor()
     null
 
-  onTestButtonClick: (e) ->
-    console.log "onTestButtonClick"
-    @testButton.loading true
-    @runCode()
-    null
-
-  onSaveButtonClick: (e) ->
-    console.log "onSaveButtonClick"
-    @saveCode()
-    null
-
   bindListenersToEditor: ->
     @editor.getSession().on 'change', (e) => @onEditorChange e
     @editor.getSession().selection.on 'changeSelection', (e) => @onEditorChange e
@@ -52,6 +41,18 @@ class @com.ee.CreatePuzzleView
 
   _removeBox: (id)->  
     $(id).addClass 'invisible' 
+  onTestButtonClick: (e) ->
+    console.log "onTestButtonClick"
+    @testButton.loading true
+    @runCode()
+    null
+
+  onSaveButtonClick: (e) ->
+    console.log "onSaveButtonClick"
+    @saveButton.loading true
+    @saveCode()
+    null
+
 
   ###
   # Run the typed code against the server
@@ -100,6 +101,7 @@ class @com.ee.CreatePuzzleView
     null
 
   onSaveResponse: (data) ->
+    @saveButton.loading false
     if data.successful == true
       console.log "urlKey: #{data.urlKey}"
       document.location.href = "/puzzles/key/#{data.urlKey}"
