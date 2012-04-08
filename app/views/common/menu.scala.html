@@ -1,78 +1,18 @@
-<ul class="nav pull-left">
-<li class="dropdown">
+<ul class="nav">
+  <li class="dropdown">
     <a href="#"
           class="dropdown-toggle"
           data-toggle="dropdown">
-          
           <b class="caret"></b>
     </a>
     <ul class="dropdown-menu">
       <li><a data-toggle="modal" id="helpModalLink" >Help</a></li>
-	    <li><a href="/users">Users</a></li>
-	    <li><a href="/puzzles/new">Submit a puzzle</a></li>
+      <li><a href="/users">Users</a></li>
+      <li><a href="/puzzles/new">Submit a puzzle</a></li>
       <li><a data-toggle="modal" id="aboutModalLink" >About</a></li>
     </ul>
   </li>
-  
-</ul>  
-
-<div class="modal" id="aboutModal" style="display: none;">
-  <div class="modal-header">
-    <a class="close" data-dismiss="modal">×</a>
-    <h3>About</h3>
-  </div>
-  <div class="modal-body">
-    <p>Built with Play! coded by Ed</p>
-  </div>
-</div>
-
-<div class="modal" id="helpModal" style="display: none;">
-  <div class="modal-header">
-    <!-- 
-    TODO: using 'x' in the link below doesn't work
-    Once deployed it turns into a '?'
-    -->
-    <a class="close" data-dismiss="modal" style="font-size: 11px;">close</a>
-    <h3>Help</h3>
-  </div>
-  <div class="modal-body">
-    <p>The list of puzzles is on the left.
-    The highlighted puzzle contents are underneath this popup in a code editor.
-    To solve the puzzle you just have to fill in all the '?' symbols, so that any evaluations
-    within the puzzle evaluate to true.
-    <br/>
-    So if you have something like:
-    <pre>true == ?</pre>
-    replace ? with 'true' so that you have:
-    <pre>true == true</pre>
-    Because this evaluation will return true - you will have completed the puzzle successfully.
-    <br/>
-    <br/>
-    Ctrl + R will run the test.
-    <br/>
-    <a href="signup">Sign up</a> and we'll keep track of your progress.
-    </p>
-  </div>
-</div>
+</ul>
+@aboutModal()
 
 
-<script type="text/javascript">
-  $(document).ready(function(){
-      $('.dropdown-toggle').dropdown();
-      
-      $("#aboutModalLink").click( function(e){
-        $('#aboutModal').modal({
-          backdrop: false
-        });
-        });
-
-
-      $("#helpModalLink").click( function(e){
-        $('#helpModal').modal({
-          backdrop: false
-        });
-        });
-
-      
-      });
-    </script>
