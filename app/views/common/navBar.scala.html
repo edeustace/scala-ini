@@ -6,8 +6,6 @@
   val pathsList = paths.toArray[String].toList
   val url = pathsList(0)
   if( request == null ){
-
-    println(">>>> request is null")
     new Html("<li><a href=\""+ url +"\">"+label+"</a></li>")
   }
   else{

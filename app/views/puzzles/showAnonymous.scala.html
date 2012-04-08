@@ -9,11 +9,9 @@
 
 
 @postBodyScript = {
-<script type="text/javascript" src="@routes.Assets.at("javascripts/LoadingButton.js")"></script>
-<script type="text/javascript" src="/assets/javascripts/string-update-processor.js"></script>
-<script type="text/javascript" src="@routes.Assets.at("javascripts/InfoBox.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("javascripts/EvaluationHighlighter.js")"></script>
-<script type="text/javascript" src="@routes.Assets.at("javascripts/SinglePuzzleView.js")"></script>
+
+@common.js.puzzleJs()
+
 <script type="text/javascript">
   
   $(document).ready(function(){

@@ -67,7 +67,7 @@ object PuzzleEvaluator
 
   val ResultSummary = "Evaluated {count}. successful: {successful} failed: {failed}"
 
-  val CompilationException = "Could not compile"
+  val CompilationException = "Could not compile the code you submitted -"
 
 
   val UnsafeStrings : List[String] = List("system", 

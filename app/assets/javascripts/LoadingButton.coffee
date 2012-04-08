@@ -14,10 +14,15 @@ class @com.ee.LoadingButton
         .find("i")
         .removeClass("icon-play")
         .addClass("icon-cog")
+
+      window.instances.loadingPane.show() if window.instances.loadingPane?
     else
       $(@id)
         .removeClass("disabled")
         .find("i")
         .removeClass("icon-cog")
         .addClass("icon-play")
+
+
+      window.instances.loadingPane.hide() if window.instances.loadingPane?
     null      
