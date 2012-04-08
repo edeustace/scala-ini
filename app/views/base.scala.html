@@ -1,46 +1,27 @@
-@(title: String, user : User = null)(content: Html, postBodyContent:Html = null)
+@(title: String)(_content: Html)(implicit _head:Html = new Html(""), _postBody:Html = new Html(""), user:User = null, request : Request[AnyContent] = null)
 <!DOCTYPE html>
 @head = {
     <head>
       <title>@title</title>
         @common.head()
+        @_head
     </head>
 }
 
 @body = {
 <body>
-  <div id="fb-root"></div>
-  
-  <script>(function(d, s, id) {
-    var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) return;
-    js = d.createElement(s); js.id = id;
-    js.src = "//connect.facebook.net/en_US/all.js#xfbml=1";
-    fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
-  </script>
-
-  <div class="navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container">
-        @common.siteLogo()
-     
-        <div class="navbar">
-            @common.user_bar()
-          </ul>
-        </div>
-       </div>
-    </div>
-  </div>
+  @common.facebookInit()
+  @common.githubRibbon()
+  @common.navBar(user,request)
   <div class="container-fluid nudge-top">
     <div class="row-fluid">
-        @content
+        @_content
     </div>
   </div>
 </body>
 } 
 @postBody = {
-  @postBodyContent
+  @_postBody
 }  
 
 @root(head)(body)(postBody)

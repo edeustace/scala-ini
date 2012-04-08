@@ -14,6 +14,8 @@ GET      /users/:email              controllers.Users.show(email)
 
 # Home page
 GET     /                           controllers.Puzzles.index()
+GET     /puzzles/our                controllers.Puzzles.index()
+GET     /puzzles/your               controllers.Puzzles.your()
 GET     /puzzles                   controllers.Puzzles.index()
 GET		/puzzles/new				controllers.Puzzles.submitPuzzlePage()
 GET		/puzzles/create				controllers.Puzzles.createPuzzlePage()

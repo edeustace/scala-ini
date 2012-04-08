@@ -1,4 +1,4 @@
-@(puzzle : Puzzle, url : String)(implicit flash: play.api.mvc.Flash) 
+@(key:String, puzzle : Puzzle, url : String)(implicit flash: play.api.mvc.Flash) 
 
 @htmlSafe(s:String) = @{
   var out = s.replace("\\", "\\\\")
@@ -17,7 +17,6 @@
 <script type="text/javascript">
   
   $(document).ready(function(){
-      
       var editor = ace.edit("editor");
       editor.setTheme("ace/theme/twilight");
       editor.getSession().setTabSize(4);
@@ -33,7 +32,6 @@
 
       var view = new com.ee.SinglePuzzleView( "/puzzles/solve", editor) 
       view.setPuzzle( "@htmlSafe(puzzle.body)" )
-      
       editor.commands.addCommand({
           name: 'myCommand',
           bindKey: {
@@ -52,9 +50,8 @@
 
 @mainContent = {
 
-<div class="editor-main-area">
-  <div class="padded-10 max-width run-bar">
-    <div>
+<div class="full-width-editor-main-area"> 
+  <div class="padded-10 max-width run-bar"> 
       <a 
         href="javascript:void(1)" 
         id="runButton" 
@@ -66,39 +63,21 @@
         class="title" 
         id="main-puzzle-title">Solve me!</span>
       &nbsp;
-      -
-      <span class="subheader" id="main-puzzle-subheader"></span>
-      <!-- facebook --> 
-      <div 
-        class="fb-like" 
-        data-href="@url" 
-        data-send="true" 
-        data-width="450" 
-        data-show-faces="false" 
-        data-font="arial"></div>
-
-        <!-- twitter -->
-        <a href="https://twitter.com/share" 
-            class="twitter-share-button" 
-            data-count="none" 
-            data-hashtags="scalapuzzles">Tweet</a>
-        <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
-
-    </div>
-    <div>
+      @common.socialBadges(url)
   </div>
 </div>
 
  
-  <pre id="editor" >/* write your code here [Ctrl-R runs it]*/</pre>
+ 
+  <pre id="editor" style="top: 96px;" >/* write your code here [Ctrl-R runs it]*/</pre>
 
   <div class="errorBoxHolder padded-10">
     <div id="successBox" class="alert alert-success invisible"></div>
-    <div id="errorBox" class="alert alert-error invisible">
-    </div>
-  </div>  
+    <div id="errorBox" class="alert alert-error invisible"> </div>
+  </div> 
+  
 </div>
 }
 
-@base("Solve me...", null)(mainContent, postBodyScript)
+@base("Scala Puzzles: [" +key + "]")(mainContent)(postBodyScript)
 

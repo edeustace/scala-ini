@@ -51,9 +51,11 @@ object Puzzles extends Controller with Secured {
   /**
    * pages
    */
-  def createPuzzlePage = BrowserRestrict{ Action{
+  def createPuzzlePage = BrowserRestrict{ 
+    Action{ implicit request => 
       Ok(views.html.puzzles.createPuzzle(PuzzleRegex.BEGIN,  PuzzleRegex.END))
-  }}
+    }
+  }
   
   
   /**
@@ -71,7 +73,7 @@ object Puzzles extends Controller with Secured {
   def showByUrlKey(key:String) = Action{ implicit request =>
 
     val puzzleUrl = "http://" + request.host + request.uri
-    Ok(views.html.puzzles.showAnonymous(Puzzle.findByUrlKey(key), puzzleUrl) )
+    Ok(views.html.puzzles.showAnonymous(key, Puzzle.findByUrlKey(key), puzzleUrl) )
   }
 
 
@@ -108,6 +110,20 @@ object Puzzles extends Controller with Secured {
     }
   }
 
+  /**
+   * List anonymouse puzzles created by users
+   */
+  def your(page: Int = 0, orderBy:Int = 1, filter: String = "") = BrowserRestrict {
+    Action { implicit request =>
+
+      val user : User = getUser(request)
+      Ok(views.html.puzzles.list(
+        "Scala Puzzles [Your]",
+        Puzzle.list(page = page, orderBy = orderBy, filter = ("%"+filter+"%"), is_on_curriculum = false),
+        orderBy, filter, user, List() )
+      )
+    }
+  }
 
   
   /**

@@ -1,4 +1,4 @@
-@(message : String, currentPage: Page[Puzzle], currentOrderBy: Int, currentFilter: String, user : User = null, solutions : Seq[UserSolution] = null	)(implicit flash: play.api.mvc.Flash)
+@(message : String, currentPage: Page[Puzzle], currentOrderBy: Int, currentFilter: String, user : User = null, solutions : Seq[UserSolution] = null)(implicit _request : Request[AnyContent], flash: play.api.mvc.Flash )
 
 @****************************************
 * Helper generating navigation links    *
@@ -24,7 +24,7 @@
         puzzles.find((p:Puzzle) => !isSolved(p, solutions))
     unsolvedPuzzle match{
       case None => puzzles.head.id
-      case p: Option[Puzzle] =>  p.get.id
+      case Some(p) =>  p.id
     }
    }.getOrElse(-1)
 }
@@ -44,28 +44,29 @@
 
 @leftColumnContent = {
 
-<div class="info-box">
-    <span id="solvedInfo" class="pull-left" style="padding-top: 5px;"></span>
-      <span class="pull-right">
-        <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
-        <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
-      </span>
-</div>
+<div class="column-400">
+  <div class="info-box">
+      <span id="solvedInfo" class="pull-left" style="padding-top: 5px;"></span>
+        <span class="pull-right">
+          <a href="javascript:void(1)" id="prevButton" class="btn btn-small btn-large">Previous</a>
+          <a href="javascript:void(1)" id="nextButton" class="btn btn-small btn-large">Next</a>
+        </span>
+  </div>
 
-<div class="holder">
-  @Option(currentPage.items).filterNot(_.isEmpty).map { puzzles =>
-    @puzzles.map { 
-      case (puzzle) => {
-         @views.html.puzzles.puzzleContainer(puzzle, isSolved(puzzle, solutions))
+  <div class="holder puzzle-list-holder">
+    @Option(currentPage.items).filterNot(_.isEmpty).map { puzzles =>
+      @puzzles.map { 
+        case (puzzle) => {
+           @views.html.puzzles.puzzleContainer(puzzle, isSolved(puzzle, solutions))
+        }
       }
+    }.getOrElse {)
+      <div class="well">
+         <em>Nothing to display</em>
+      </div>
     }
-  }.getOrElse {)
-    <div class="well">
-       <em>Nothing to display</em>
-    </div>
-  }
+  </div>
 </div>
-
 }
 
 
@@ -147,13 +148,13 @@
       });
   });
 </script>
-
+ 
 
 }
 
 @mainContent = {
 
-<div class="editor-main-area">
+<div class="editor-main-area flush-left">
 
     <div class="padded-10 max-width run-bar">
       <div>
@@ -161,7 +162,7 @@
         &nbsp;
         <span class="title" id="main-puzzle-title"></span>
         &nbsp;
-        -
+        - &nbsp;
         <span class="subheader" id="main-puzzle-subheader"></span>
       </div>
     </div>
@@ -175,7 +176,6 @@
     </div> 
   </div> 
 }
+@head = {}
 
-
-@main(message, user)(mainContent)(postBodyScript, leftColumnContent) 
-
+@twoColumn(message, user)(mainContent)(leftColumnContent, postBodyScript, head, _request)

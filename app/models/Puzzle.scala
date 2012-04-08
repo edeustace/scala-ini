@@ -162,7 +162,8 @@ object Puzzle {
   def list(page: Int = 0, 
           pageSize: Int = 100,
           orderBy: Int = 1, 
-          filter: String = ""): Page[(Puzzle)] = {
+          filter: String = "", 
+          is_on_curriculum : Boolean = true): Page[(Puzzle)] = {
     
     val offset = pageSize * page
     
@@ -173,7 +174,7 @@ object Puzzle {
           select * from puzzle as puzzle 
               inner JOIN app_user as app_user
               on app_user.email = puzzle.user_email
-          where puzzle.name like {filter} and puzzle.is_on_curriculum = true
+          where puzzle.name like {filter} and puzzle.is_on_curriculum = {is_on_curriculum}
           order by 1
           limit {pageSize} offset {offset}
         """
@@ -181,7 +182,8 @@ object Puzzle {
         'pageSize -> pageSize, 
         'offset -> offset,
         'filter -> filter,
-        'orderBy -> orderBy
+        'orderBy -> orderBy,
+        'is_on_curriculum -> is_on_curriculum
       ).as(Puzzle.simple *)
 
       val totalRows = SQL(

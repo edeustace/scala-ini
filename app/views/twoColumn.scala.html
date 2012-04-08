@@ -1,0 +1,14 @@
+@(title: String, user : User = null)(_mainContent: Html)( implicit _minorContent: Html = new Html(""), _postBodyScripts:Html = new Html(""), _head : Html = new Html(""), _request : Request[AnyContent] = null )
+
+@content = {
+<div class="container-fluid nudge-top">
+  <div class="row-fluid">
+    @_minorContent
+    <div class="column left-400 max-width">
+      @_mainContent
+    </div>
+  </div>
+</div>
+}
+
+@base(title)(content)(_head, _postBodyScripts, user, _request)

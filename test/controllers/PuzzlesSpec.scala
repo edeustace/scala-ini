@@ -17,24 +17,14 @@ class PuzzlesSpec extends Specification with Tags {
 
   val beginTag = PuzzleRegex.BEGIN 
   val endTag = PuzzleRegex.END
-
-  //args(include="1")
-
-  // -- Date helpers
-  
-  def dateIs(date: java.util.Date, str: String) = new java.text.SimpleDateFormat("yyyy-MM-dd").format(date) == str
-  
-  // --
   
   "Application" should {
-    
 
     "show the puzzle list on  /" in {
 
       running(FakeApplication(additionalConfiguration = SpecHelper.testDb())) {
       
         val result : Action[AnyContent] = controllers.Puzzles.index()
-        
         val actualResult = result.apply(FakeRequest())
         status(actualResult) must equalTo(OK)
       }

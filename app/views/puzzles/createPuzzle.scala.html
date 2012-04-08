@@ -1,4 +1,4 @@
-@(puzzleStart : String, puzzleEnd: String)
+@(puzzleStart : String, puzzleEnd: String)(implicit _request : Request[AnyContent])
 
 
 @postBodyContent = {
@@ -48,8 +48,7 @@
 }
 
 @mainContent = {
-
-<div class="editor-main-area">
+<div class="full-width-editor-main-area">
   <div class="padded-10 max-width run-bar">
     <div>
       <a href="javascript:void(1)" id="testButton" class="btn btn-primary btn-large"><i class="icon-refresh"></i> Test</a>
@@ -77,7 +76,7 @@
   </div>  
 </div>
 }
+@head = {}
 
-
-@base("Create your own puzzle", null)(mainContent, postBodyContent) 
+@base("Create your own puzzle")(mainContent)(head, postBodyContent, null, _request) 
 

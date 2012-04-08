@@ -1,3 +1,270 @@
-.blah{
-  color: white;
+@main-blue: #006BFF;
+@main-yellow: #E8CC00;
+@main-green: #70FF00;
+@twilight-bg: #141414;
+@solved-color: desaturate(darken(@main-green, 0%), 60%);
+@left-bar-width: 400px;
+@title-color: lighten(@main-blue, 30%);
+@button-color: lighten(desaturate(@main-blue, 60%), 10%);
+@main-bg-color: desaturate(darken(@main-blue, -30%), 40%);
+/* navbar colors */
+@navbar-gradient-top: darken(@main-bg-color,50%);
+@navbar-gradient-bottom: darken(@main-bg-color, 60%);
+@navbar-bg: @twilight-bg;
+@green-bg: darken(@main-green, 20%);
+@grey-bg: desaturate(@main-yellow, 80%);
+/* dimensions */
+@editor-height: 500px;
+
+a:hover,
+a{
+  text-decoration: none;
 }
+/* -- custom gutter icons -- */
+
+.ace_passed{
+  background-repeat: no-repeat;
+  background-position: 2px 2px;
+  background-image: url('/assets/images/tick-circle.png');
+}
+.ace_failed{
+  background-image: url('/assets/images/x.png');
+  background-position: 2px 2px;
+  background-repeat: no-repeat;
+}
+
+.social-badges{
+}
+
+.twitter-badge-holder{
+ top: 3px;
+ position: relative;
+}
+
+
+.errorBoxHolder{
+  position: absolute;
+  bottom: 40px;
+}
+
+#editor{
+  bottom: 0px;
+  top:55px;
+  left: 0px;
+  right: 0px;
+  height: 100%;
+  width: 100%;
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+.puzzle-list-holder{
+  .gen-pale-bg;
+}
+
+.gen-pale-bg{
+  background-color: @title-color;
+}
+
+hr{
+ padding: 0px;
+ margin: 0px; 
+ border: none;
+}
+
+hr.thin{
+ border-top: dashed 1px lighten(@main-bg-color, 10%);
+}
+
+.holder{
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  top: 96px;
+  width: @left-bar-width; 
+  overflow: auto;
+}
+
+.run-bar{
+  padding: 8px;
+  width: 100%;
+  .gen-bar-gradient( darken(@button-color, 20%));
+
+  .title{
+    font-size: 20px;
+    color: white;
+  }
+  .subheader{
+    font-size: 15px;
+    color: saturate(@main-bg-color, 70%);
+  }
+}
+
+
+.info-box-light,
+.info-box{
+  padding: 14px;
+  background-color: @button-color;
+  width: @left-bar-width - 28;
+  left: 0px;
+  position:fixed;
+  top: 40px;
+  z-index: 1005;
+  .gen-box-shadow;
+  .gen-bar-gradient(@button-color);
+}
+
+.info-box-light{
+  @color: lighten(@main-bg-color, 10%);
+  background-color: @color;
+  .gen-bar-gradient(@color);
+}
+
+.column-400{
+  float:left;
+  width: @left-bar-width;
+  height: 100%;
+}
+.full-width-editor-main-area,
+.editor-main-area
+{
+  position: fixed;
+  right: 0px;
+  height: 100%;
+  top: 40px;
+  background-color: @twilight-bg;
+}
+
+.full-width-editor-main-area{
+  left: 0px;
+}
+
+.flush-left{
+  left: @left-bar-width;
+  float:left;
+}
+
+
+.puzzle-container.selected{
+    background-color: darken(@main-bg-color, 10%);
+  }
+.puzzle-container{
+  padding: 5px;
+  width: @left-bar-width - 10px;
+
+  table{
+    width: 95%;
+  }
+  .details{
+    .gen-border-radius;
+    display: block;
+    width: 100%;
+    padding-bottom: 5px;
+  }
+  .code-tests{
+    .gen-border-radius;
+    padding: 5px;
+    background-color: lighten(@main-bg-color, 40%);
+  }
+  .description{
+    font-style: italic;
+    padding-bottom: 5px;
+  }
+  solved{
+    color: @solved-color;
+  }
+}
+
+.puzzle-container:after{ clear:both;}
+.max-width{
+  width: 100%;
+}
+  
+/* Bootstrap overrides */
+.brand{
+  font-family: 'Pacifico', cursive;
+  text-shadow: 1px 1px 8px #000000;
+  filter: dropshadow(color=#000000, offx=1, offy=1);
+  color: @title-color;
+  a{
+    color: @title-color;
+    text-decoration:none;
+  }
+}
+
+
+.navbar .nav > li > a {
+  color: @title-color;
+}
+.navbar-inner {
+  background-color: @navbar-bg;
+  background-image: -moz-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -ms-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(@navbar-gradient-top), to(@navbar-gradient-bottom));
+  background-image: -webkit-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: -o-linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-image: linear-gradient(top, @navbar-gradient-top, @navbar-gradient-bottom);
+  background-repeat: repeat-x;
+  .gen-box-shadow(0.5,0.6, 5px);
+  .gen-border-radius(0px);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='@navbar-gradient-top', endColorstr='@navbar-gradient-bottom', GradientType=0);
+}
+
+/* Generators */
+
+.gen-border-radius (@radius: 5px) {
+  border-radius: @radius;
+  -moz-border-radius: @radius;
+  -webkit-border-radius: @radius;
+}
+
+
+.gen-box-shadow(@alpha-one: 0.25, @alpha-two: 0.1, @blur: 3px){
+  -webkit-box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+  -moz-box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+  box-shadow: 0 1px @blur rgba(0, 0, 0, @alpha-one), inset 0 -1px 0 rgba(0, 0, 0, @alpha-two);
+}
+
+
+.gen-bar-gradient(@color: #00ff00 ){
+ background-color: @color;
+  background-image: -moz-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -ms-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(darken(@color, 10%)), to(@color));
+  background-image: -webkit-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: -o-linear-gradient(top, darken(@color, 10%), @color);
+  background-image: linear-gradient(top, darken(@color, 10%), @color);
+
+}
+
+.gen-border-radius (@radius: 5px) {
+  border-radius: @radius;
+  -moz-border-radius: @radius;
+  -webkit-border-radius: @radius;
+}
+
+.border-radius-top(@radius: 5px)
+{
+  ._border-radius-each(@radius, @radius, 0px, 0px);
+}
+
+.border-radius-bottom(@radius: 5px)
+{
+  ._border-radius-each(0px, 0px, 5px, 5px);
+}
+
+._border-radius-each(@tl:5px, @tr: 5px, @bl: 5px, @br: 5px)
+{
+    -moz-border-radius-topleft: @tl;
+    border-top-left-radius: @tl;
+
+    -moz-border-radius-topright: @tr;
+    border-top-right-radius: @tr;
+
+    -moz-border-radius-bottomleft: @bl;
+    border-bottom-left-radius: @bl;
+
+    -moz-border-radius-bottomright: @br;
+    border-bottom-right-radius: @br;
+}
+

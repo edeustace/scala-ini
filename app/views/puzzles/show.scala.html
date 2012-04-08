@@ -4,7 +4,7 @@
 @renderInputInline( test : String ) = {
         @Html(test.replace("?", "<input type='text'></input>"))
 }
-@main(message, user) { @puzzle.name
+@mainContent = { @puzzle.name
 <br />
 @puzzle.description
 <br />
@@ -70,3 +70,7 @@
   };
   </script>
 }
+@minorContent = {}
+@head = {}
+
+@twoColumn(message, user)(mainContent)

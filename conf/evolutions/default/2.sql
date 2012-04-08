@@ -7,6 +7,15 @@ insert into app_user (email,name,password)
 insert into app_user (email,name,password) 
   values ('edeustace@yahoo.com','ed eustace','password');
 
+
+insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
+	values ('Start here','The simplest puzzle ever','/*
+For all puzzles you need to replace all ? with code, so that any equality check (==) in the puzzle returns true.
+Below is the simplest puzzle ever - replace the ? with true so that the puzzle passes.
+*/
+true == /*<*/true/*>*/',
+'easy', 'basics', 'ed.eustace@gmail.com', true);
+
 insert into puzzle (name,description,body,level,category,user_email, is_on_curriculum) 
 	values ('The basics','Some simple tests to get you started','//booleans
 true == /*<*/true/*>*/
