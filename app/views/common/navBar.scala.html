@@ -3,7 +3,7 @@
 
 @generateLink(label:String, paths : String* ) = @{
 
-  val pathsList = List.fromArray(paths.toArray[String])
+  val pathsList = paths.toArray[String].toList
   val url = pathsList(0)
   if( request == null ){
 
