@@ -13,7 +13,8 @@ You will need to create a user and database for the tests and for the normal app
 db called ````scalaini_test````
 
 
-The db for the regular app you configure through an environment variable ````DATABASE_URL````. So set that to whatever you want.
+The db for the regular app you configure through an environment variable ````DATABASE_URL````. 
+So set that to whatever you want, here's an example ````export DATABASE_URL="postgres://db_username:my_password@localhost/scalaini"````
 
 Then
 
