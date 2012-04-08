@@ -10,7 +10,7 @@ class @com.ee.CreatePuzzleView
   # should the user choose that link.
   ###
   constructor: (@solveUrl, @saveUrl, @editor, @defaultEditorText, @puzzleStart = "/*<<*/", @puzzleEnd = "/*>>*/" )->
-    console.log "CreatePuzzleView constructor solveUrl: #{@solveUrl}"
+    #console.log "CreatePuzzleView constructor solveUrl: #{@solveUrl}"
     @testButton = new com.ee.LoadingButton("#testButton", (e) => @onTestButtonClick e)
     @saveButton = new com.ee.LoadingButton("#saveButton", (e) => @onSaveButtonClick e)
     @evalHighlighter = new com.ee.EvaluationHighlighter(@editor)
@@ -42,13 +42,13 @@ class @com.ee.CreatePuzzleView
   _removeBox: (id)->  
     $(id).addClass 'invisible' 
   onTestButtonClick: (e) ->
-    console.log "onTestButtonClick"
+    #console.log "onTestButtonClick"
     @testButton.loading true
     @runCode()
     null
 
   onSaveButtonClick: (e) ->
-    console.log "onSaveButtonClick"
+    #console.log "onSaveButtonClick"
     @saveButton.loading true
     @saveCode()
     null
@@ -69,13 +69,13 @@ class @com.ee.CreatePuzzleView
   onTestResponse: (data) ->
     @testButton.loading false
 
-    console.log data
+    #console.log data
     
     if data.successful == true 
-      console.log "success"
+      #console.log "success"
       @evalHighlighter.clear()
     else 
-      console.log "failure: #{data.result.summary}"
+      #console.log "failure: #{data.result.summary}"
       $("#errorBox")
         .html("Error: #{data.result.summary}")
         .removeClass('invisible')
@@ -103,7 +103,7 @@ class @com.ee.CreatePuzzleView
   onSaveResponse: (data) ->
     @saveButton.loading false
     if data.successful == true
-      console.log "urlKey: #{data.urlKey}"
+      #console.log "urlKey: #{data.urlKey}"
       document.location.href = "/puzzles/key/#{data.urlKey}"
     else
       $("#errorBox")
@@ -112,14 +112,14 @@ class @com.ee.CreatePuzzleView
     null
  
   handleRunResponse: (data) ->
-    console.log(data)
+    #console.log(data)
     if data.successful == true 
-      console.log "success"
+      #console.log "success"
       $("#successBox")
         .html("Success!")
         .removeClass('invisible')
     else 
-      console.log "failure: #{data.exception}"
+      #console.log "failure: #{data.exception}"
       $("#errorBox")
         .html("Error: #{data.message}")
         .removeClass('invisible')
