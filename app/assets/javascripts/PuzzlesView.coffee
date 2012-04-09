@@ -11,7 +11,6 @@ class @com.ee.PuzzlesView
   should the user choose that link.
   ###
   constructor: (@solveUrl, @editor, @puzzles,  @existingSolutions)->
-    console.log "PuzzlesView constructor solveUrl: #{@solveUrl}"
     null
 
   ###

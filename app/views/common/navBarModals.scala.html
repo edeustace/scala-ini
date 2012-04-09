@@ -8,6 +8,20 @@
   </div>
 </div>
 
+<div class="modal" id="morePuzzlesModal" style="display: none;">
+  <div class="modal-header">
+    <a class="close" data-dismiss="modal">×</a>
+    <h3>We need more puzzles..</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+    We need more puzzles for the curriculum. Soon you'll be able to do this when you're creating a puzzle, but for now if you've created one you think is pretty cool and a good fit for the curriculum - send me a mail with the link to your puzzle.
+    <br/>
+    Mail me on:  ed[dot]eustace at google's mail thingy.
+    </p>
+  </div>
+</div>
+
 <div class="modal" id="aboutModal" style="display: none;">
   <div class="modal-header">
     <a class="close" data-dismiss="modal">×</a>
@@ -64,25 +78,19 @@
 <script type="text/javascript">
   $(document).ready(function(){
       $('.dropdown-toggle').dropdown();
+
+      var initModal = function( name ) {
       
-      $("#aboutModalLink").click( function(e){
-        $('#aboutModal').modal({
+      $("#"+name+"Link").click( function(e){
+        $('#' + name ).modal({
           backdrop: false
         });
         });
+      }
 
-
-      $("#helpModalLink").click( function(e){
-        $('#helpModal').modal({
-          backdrop: false
-        });
-        });
-
-      $("#yourPuzzlesModalLink").click( function(e){
-        $('#yourPuzzlesModal').modal({
-          backdrop: false
-        });
-        });
+      initModal("aboutModal");
+      initModal("helpModal");
+      initModal("morePuzzlesModal");
       
       });
     </script>

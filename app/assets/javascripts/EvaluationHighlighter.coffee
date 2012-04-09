@@ -1,7 +1,6 @@
 window.com = (window.com || {})
 com.ee = (com.ee || {})
 
-console.log "load EvaluationHightlighter"
 ###
 # Shows/Hides evaluations in the Ace Editor.
 ###
