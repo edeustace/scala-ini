@@ -13,7 +13,8 @@ object BrowserCheck {
 
      s.contains("Firefox") || 
      s.contains("Chrome") ||
-     s.contains("Safari")
+     s.contains("Safari") ||
+     s.contains("conkeror")
     }
     case _ => false
   }
