@@ -1,5 +1,5 @@
 # Introduction
-
+ 
 
 Source code for [scalapuzzles.org](http://scalapuzzles.org) - inspired by 4clojure.org, but with a different ui and for Scala.
 
